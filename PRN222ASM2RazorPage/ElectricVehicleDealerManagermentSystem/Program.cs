@@ -1,3 +1,4 @@
+using ElectricVehicleDealerManagermentSystem.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Context;
 using Repositories.CustomRepositories;
@@ -23,6 +24,9 @@ namespace ElectricVehicleDealerManagermentSystem
 
             //auto mapper
             builder.Services.AddAutoMapper(cfg => { }, typeof(MapperProfile));
+
+            // SignalR
+            builder.Services.AddSignalR();
 
             // Add UnitOfWork
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -67,6 +71,7 @@ namespace ElectricVehicleDealerManagermentSystem
             app.UseAuthorization();
 
             app.MapRazorPages();
+            app.MapHub<SignalRHub>("/signalrhub");
 
             app.Run();
         }

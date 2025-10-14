@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DataTransferObject\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
   </ItemGroup>
 
