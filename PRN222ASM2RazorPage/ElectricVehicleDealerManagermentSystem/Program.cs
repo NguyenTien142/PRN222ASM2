@@ -22,6 +22,15 @@ namespace ElectricVehicleDealerManagermentSystem
 
             builder.Services.AddDbContext<Prn222asm2Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Add session services
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             //auto mapper
             builder.Services.AddAutoMapper(cfg => { }, typeof(MapperProfile));
 
@@ -67,6 +76,9 @@ namespace ElectricVehicleDealerManagermentSystem
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // Use session middleware
+            app.UseSession();
 
             app.UseAuthorization();
 

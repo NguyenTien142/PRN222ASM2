@@ -59,7 +59,7 @@ public partial class Prn222asm2Context : DbContext
     {
         modelBuilder.Entity<Appointment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Appointm__3214EC0781FB7AE1");
+            entity.HasKey(e => e.Id).HasName("PK__Appointm__3214EC072CEBC2DF");
 
             entity.ToTable("Appointment");
 
@@ -81,13 +81,15 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Customer__3214EC078E2FCB1B");
+            entity.HasKey(e => e.Id).HasName("PK__Customer__3214EC07EE1A8518");
 
             entity.ToTable("Customer");
 
-            entity.HasIndex(e => e.UserId, "UQ__Customer__1788CC4D4F2AB3E4").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Customer__1788CC4D3604846A").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Customer__A9D1053410A41CF9").IsUnique();
+            entity.HasIndex(e => e.Phone, "UQ__Customer__5C7E359E1344107E").IsUnique();
+
+            entity.HasIndex(e => e.Email, "UQ__Customer__A9D10534582B07B9").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.Email).HasMaxLength(100);
@@ -102,11 +104,11 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<Dealer>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Dealer__3214EC07B86DFA97");
+            entity.HasKey(e => e.Id).HasName("PK__Dealer__3214EC07CCDE1873");
 
             entity.ToTable("Dealer");
 
-            entity.HasIndex(e => e.UserId, "UQ__Dealer__1788CC4D6D18DB0B").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Dealer__1788CC4D56378C35").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.DealerName).HasMaxLength(100);
@@ -114,12 +116,12 @@ public partial class Prn222asm2Context : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.Dealer)
                 .HasForeignKey<Dealer>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Dealer__UserId__44FF419A");
+                .HasConstraintName("FK__Dealer__UserId__440B1D61");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC07BE9F33CE");
+            entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC07166F528C");
 
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(getdate())")
@@ -142,7 +144,7 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<OrderVehicle>(entity =>
         {
-            entity.HasKey(e => new { e.OrderId, e.VehicleId }).HasName("PK__Order_Ve__F7E6EE862555D033");
+            entity.HasKey(e => new { e.OrderId, e.VehicleId }).HasName("PK__Order_Ve__F7E6EE86C11122A9");
 
             entity.ToTable("Order_Vehicle");
 
@@ -161,16 +163,14 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Roles__3214EC078B71ACC5");
+            entity.HasKey(e => e.Id).HasName("PK__Roles__3214EC07E3113BD3");
 
             entity.Property(e => e.RoleName).HasMaxLength(50);
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC071DFE0A70");
-
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E420F8063A").IsUnique();
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0737E9E94F");
 
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.RoleId).HasDefaultValue(1);
@@ -179,12 +179,12 @@ public partial class Prn222asm2Context : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Users__RoleId__3F466844");
+                .HasConstraintName("FK__Users__RoleId__3E52440B");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Vehicle__3214EC07CCA3EC4B");
+            entity.HasKey(e => e.Id).HasName("PK__Vehicle__3214EC078338C22B");
 
             entity.ToTable("Vehicle");
 
@@ -202,7 +202,7 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<VehicleCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Vehicle___3214EC07E4EEED49");
+            entity.HasKey(e => e.Id).HasName("PK__Vehicle___3214EC0744964F1A");
 
             entity.ToTable("Vehicle_Category");
 
@@ -211,7 +211,7 @@ public partial class Prn222asm2Context : DbContext
 
         modelBuilder.Entity<VehicleDealer>(entity =>
         {
-            entity.HasKey(e => new { e.VehicleId, e.DealerId }).HasName("PK__Vehicle___7BC9AC7919EEF396");
+            entity.HasKey(e => new { e.VehicleId, e.DealerId }).HasName("PK__Vehicle___7BC9AC79CFBA27E8");
 
             entity.ToTable("Vehicle_Dealer");
 

@@ -1,4 +1,5 @@
-﻿using Services.DataTransferObject.UserDTO;
+﻿using Services.DataTransferObject.Common;
+using Services.DataTransferObject.UserDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

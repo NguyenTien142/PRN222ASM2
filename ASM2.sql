@@ -23,11 +23,14 @@ CREATE TABLE Roles (
     RoleName NVARCHAR(50) NOT NULL CHECK (RoleName IN ('User', 'Dealer'))
 );
 
+INSERT INTO Roles (RoleName) VALUES
+(N'User'), (N'Dealer');
+
 -- 3. Users (system accounts for authentication)
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     RoleId INT NOT NULL DEFAULT 1,
-    Username NVARCHAR(50) UNIQUE NOT NULL,
+    Username NVARCHAR(50) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     IsDeleted BIT NOT NULL DEFAULT 0,
     FOREIGN KEY (RoleId) REFERENCES Roles(Id)
@@ -48,7 +51,7 @@ CREATE TABLE Customer (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     UserId INT NOT NULL UNIQUE,
     Name NVARCHAR(100) NOT NULL,
-    Phone NVARCHAR(20) NOT NULL,
+    Phone NVARCHAR(20) UNIQUE NOT NULL,
     Email NVARCHAR(100) UNIQUE NOT NULL,
     Address NVARCHAR(255) NOT NULL,
     FOREIGN KEY (UserId) REFERENCES Users(Id)

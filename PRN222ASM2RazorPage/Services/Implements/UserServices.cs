@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Repositories.Interfaces;
 using Repositories.Model;
+using Services.DataTransferObject.Common;
 using Services.DataTransferObject.UserDTO;
 using Services.Interfaces;
 using System;
@@ -112,22 +113,46 @@ namespace Services.Implements
                 var customerRepository = _unitOfWork.GetRepository<Customer, int>();
                 var dealerRepository = _unitOfWork.GetRepository<Dealer, int>();
 
-                // Check if username already exists
-                var existingUser = await userRepository.FirstOrDefaultAsync(
-                    u => u.Username == request.Username);
-
-                if (existingUser != null)
+                // Since username is no longer unique, we don't need to check for existing username
+                // But we need to check for unique phone and email for customers
+                if (request.RoleId == 1) // Customer
                 {
-                    return new ServiceResponse<GetUserRespond>
+                    // Check if customer phone already exists
+                    if (!string.IsNullOrEmpty(request.CustomerPhone))
                     {
-                        Success = false,
-                        Message = "Username already exists."
-                    };
+                        var existingCustomerByPhone = await customerRepository.FirstOrDefaultAsync(
+                            c => c.Phone == request.CustomerPhone);
+
+                        if (existingCustomerByPhone != null)
+                        {
+                            return new ServiceResponse<GetUserRespond>
+                            {
+                                Success = false,
+                                Message = "Phone number already exists. Please use a different phone number."
+                            };
+                        }
+                    }
+
+                    // Check if customer email already exists
+                    if (!string.IsNullOrEmpty(request.CustomerEmail))
+                    {
+                        var existingCustomerByEmail = await customerRepository.FirstOrDefaultAsync(
+                            c => c.Email == request.CustomerEmail);
+
+                        if (existingCustomerByEmail != null)
+                        {
+                            return new ServiceResponse<GetUserRespond>
+                            {
+                                Success = false,
+                                Message = "Email address already exists. Please use a different email address."
+                            };
+                        }
+                    }
                 }
 
                 await _unitOfWork.BeginTransactionAsync();
 
-                // Create user
+                // Create user (username can be duplicate now)
                 var user = _mapper.Map<User>(request);
                 user.PasswordHash = HashPassword(request.Password);
 
@@ -135,7 +160,6 @@ namespace Services.Implements
                 await _unitOfWork.SaveChangesAsync();
 
                 // Create customer or dealer based on role
-                // Assuming role 1 = Customer, role 2 = Dealer (adjust as needed)
                 if (request.RoleId == 1 && !string.IsNullOrEmpty(request.CustomerName))
                 {
                     var customer = _mapper.Map<Customer>(request);
@@ -234,23 +258,9 @@ namespace Services.Implements
 
                 await _unitOfWork.BeginTransactionAsync();
 
-                // Update user fields
+                // Update user fields (username no longer needs uniqueness check)
                 if (!string.IsNullOrEmpty(request.Username))
                 {
-                    // Check if new username already exists
-                    var existingUser = await userRepository.FirstOrDefaultAsync(
-                        u => u.Username == request.Username && u.Id != request.Id);
-                    
-                    if (existingUser != null)
-                    {
-                        await _unitOfWork.RollbackTransactionAsync();
-                        return new ServiceResponse<GetUserRespond>
-                        {
-                            Success = false,
-                            Message = "Username already exists."
-                        };
-                    }
-                    
                     user.Username = request.Username;
                 }
 
@@ -264,12 +274,44 @@ namespace Services.Implements
                 // Update customer or dealer information
                 if (user.Customer != null)
                 {
+                    // Check for unique phone if phone is being updated
+                    if (!string.IsNullOrEmpty(request.CustomerPhone) && request.CustomerPhone != user.Customer.Phone)
+                    {
+                        var existingCustomerByPhone = await customerRepository.FirstOrDefaultAsync(
+                            c => c.Phone == request.CustomerPhone && c.Id != user.Customer.Id);
+
+                        if (existingCustomerByPhone != null)
+                        {
+                            await _unitOfWork.RollbackTransactionAsync();
+                            return new ServiceResponse<GetUserRespond>
+                            {
+                                Success = false,
+                                Message = "Phone number already exists. Please use a different phone number."
+                            };
+                        }
+                        user.Customer.Phone = request.CustomerPhone;
+                    }
+
+                    // Check for unique email if email is being updated
+                    if (!string.IsNullOrEmpty(request.CustomerEmail) && request.CustomerEmail != user.Customer.Email)
+                    {
+                        var existingCustomerByEmail = await customerRepository.FirstOrDefaultAsync(
+                            c => c.Email == request.CustomerEmail && c.Id != user.Customer.Id);
+
+                        if (existingCustomerByEmail != null)
+                        {
+                            await _unitOfWork.RollbackTransactionAsync();
+                            return new ServiceResponse<GetUserRespond>
+                            {
+                                Success = false,
+                                Message = "Email address already exists. Please use a different email address."
+                            };
+                        }
+                        user.Customer.Email = request.CustomerEmail;
+                    }
+
                     if (!string.IsNullOrEmpty(request.CustomerName))
                         user.Customer.Name = request.CustomerName;
-                    if (!string.IsNullOrEmpty(request.CustomerPhone))
-                        user.Customer.Phone = request.CustomerPhone;
-                    if (!string.IsNullOrEmpty(request.CustomerEmail))
-                        user.Customer.Email = request.CustomerEmail;
                     if (!string.IsNullOrEmpty(request.CustomerAddress))
                         user.Customer.Address = request.CustomerAddress;
 
