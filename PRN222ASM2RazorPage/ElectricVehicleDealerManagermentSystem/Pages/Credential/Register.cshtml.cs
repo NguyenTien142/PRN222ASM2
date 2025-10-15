@@ -48,6 +48,11 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
             [Compare("Password", ErrorMessage = "Password and confirmation password do not match")]
             public string ConfirmPassword { get; set; } = string.Empty;
 
+            [Required(ErrorMessage = "Email address is required")]
+            [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+            [Display(Name = "Email Address")]
+            public string Email { get; set; } = string.Empty;
+
             [Required(ErrorMessage = "Please select a role")]
             [Display(Name = "Register as")]
             public int RoleId { get; set; }
@@ -59,10 +64,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
             [Display(Name = "Phone Number")]
             [Phone(ErrorMessage = "Please enter a valid phone number")]
             public string? CustomerPhone { get; set; }
-
-            [Display(Name = "Email Address")]
-            [EmailAddress(ErrorMessage = "Please enter a valid email address")]
-            public string? CustomerEmail { get; set; }
 
             [Display(Name = "Address")]
             public string? CustomerAddress { get; set; }
@@ -104,12 +105,12 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
                 {
                     Username = Input.Username,
                     Password = Input.Password,
+                    Email = Input.Email,  // Now at user level
                     RoleId = Input.RoleId,
                     
-                    // Customer fields
+                    // Customer fields (email removed)
                     CustomerName = Input.CustomerName,
                     CustomerPhone = Input.CustomerPhone,
-                    CustomerEmail = Input.CustomerEmail,
                     CustomerAddress = Input.CustomerAddress,
                     
                     // Dealer fields
@@ -156,9 +157,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
                 
                 if (string.IsNullOrWhiteSpace(Input.CustomerPhone))
                     ModelState.AddModelError("Input.CustomerPhone", "Phone Number is required for customer registration");
-                
-                if (string.IsNullOrWhiteSpace(Input.CustomerEmail))
-                    ModelState.AddModelError("Input.CustomerEmail", "Email Address is required for customer registration");
                 
                 if (string.IsNullOrWhiteSpace(Input.CustomerAddress))
                     ModelState.AddModelError("Input.CustomerAddress", "Address is required for customer registration");

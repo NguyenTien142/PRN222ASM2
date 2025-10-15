@@ -20,17 +20,18 @@ CREATE TABLE Vehicle_Category (
 -- 2. Roles
 CREATE TABLE Roles (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    RoleName NVARCHAR(50) NOT NULL CHECK (RoleName IN ('User', 'Dealer'))
+    RoleName NVARCHAR(50) NOT NULL CHECK (RoleName IN ('Customer', 'Dealer'))
 );
 
 INSERT INTO Roles (RoleName) VALUES
-(N'User'), (N'Dealer');
+(N'Customer'), (N'Dealer');
 
 -- 3. Users (system accounts for authentication)
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     RoleId INT NOT NULL DEFAULT 1,
     Username NVARCHAR(50) NOT NULL,
+	Email NVARCHAR(100) UNIQUE NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL,
     IsDeleted BIT NOT NULL DEFAULT 0,
     FOREIGN KEY (RoleId) REFERENCES Roles(Id)
@@ -52,7 +53,6 @@ CREATE TABLE Customer (
     UserId INT NOT NULL UNIQUE,
     Name NVARCHAR(100) NOT NULL,
     Phone NVARCHAR(20) UNIQUE NOT NULL,
-    Email NVARCHAR(100) UNIQUE NOT NULL,
     Address NVARCHAR(255) NOT NULL,
     FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
@@ -130,3 +130,66 @@ CREATE TABLE Order_Vehicle (
     FOREIGN KEY (VehicleId) REFERENCES Vehicle(Id)
 );
 GO
+
+-- ====================================
+-- 🌱 TEST DATA SEED FOR PRN222ASM2
+-- ====================================
+
+-- 1️⃣ Vehicle Categories
+INSERT INTO Vehicle_Category (Name) VALUES
+(N'Sedan'),
+(N'SUV'),
+(N'Pickup'),
+(N'Sports Car');
+
+-- 2️⃣ Users
+INSERT INTO Users (RoleId, Username, Email, PasswordHash, IsDeleted) VALUES
+(2, N'dealer1', N'dealer1@dealers.com', N'jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=', 0),
+(2, N'dealer2', N'dealer2@dealers.com', N'jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=', 0),
+(1, N'user1', N'user1@gmail.com', N'jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=', 0),
+(1, N'user2', N'user2@gmail.com', N'jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=', 0);
+
+-- 3️⃣ Dealers
+INSERT INTO Dealer (UserId, DealerName, Address, Quantity) VALUES
+(1, N'Speed Motors', N'123 Nguyen Trai, District 5, HCMC', 20),
+(2, N'Auto Galaxy', N'45 Le Loi, Hoan Kiem, Hanoi', 15);
+
+-- 4️⃣ Customers
+INSERT INTO Customer (UserId, Name, Phone, Address) VALUES
+(3, N'Nguyen Van A', N'0901234567', N'12 Tran Hung Dao, HCMC'),
+(4, N'Tran Thi B', N'0917654321', N'56 Pham Van Dong, Hanoi');
+
+-- 5️⃣ Vehicles
+INSERT INTO Vehicle (CategoryId, Color, Price, ManufactureDate, Model, Version, Image, IsDeleted) VALUES
+(1, N'Red', 55000, '2023-05-12', N'Toyota Camry', N'2.5Q', N'/images/camry.jpg', 0),
+(2, N'Black', 72000, '2024-01-25', N'Hyundai Tucson', N'2024 Edition', N'/images/tucson.jpg', 0),
+(3, N'White', 68000, '2023-07-15', N'Ford Ranger', N'Wildtrak', N'/images/ranger.jpg', 0),
+(4, N'Blue', 120000, '2024-03-01', N'BMW Z4', N'M40i', N'/images/z4.jpg', 0),
+(1, N'Silver', 43000, '2022-11-18', N'Honda Civic', N'RS Turbo', N'/images/civic.jpg', 0);
+
+-- 6️⃣ Vehicle_Dealer (inventory by dealer)
+INSERT INTO Vehicle_Dealer (VehicleId, DealerId, Quantity) VALUES
+(1, 1, 5),
+(2, 1, 3),
+(3, 2, 4),
+(4, 2, 2),
+(5, 1, 6);
+
+-- 7️⃣ Appointments (customers viewing/test-driving vehicles)
+INSERT INTO Appointment (CustomerId, VehicleId, AppointmentDate, Status) VALUES
+(1, 1, DATEADD(DAY, -3, GETDATE()), 'COMPLETED'),
+(1, 5, DATEADD(DAY, 2, GETDATE()), 'PENDING'),
+(2, 2, DATEADD(DAY, -1, GETDATE()), 'APPROVE'),
+(2, 4, DATEADD(DAY, 5, GETDATE()), 'PENDING');
+
+-- 8️⃣ Orders
+INSERT INTO Orders (CustomerId, DealerId, OrderDate, TotalAmount, Status) VALUES
+(1, 1, DATEADD(DAY, -7, GETDATE()), 55000, 'DONE'),
+(2, 2, DATEADD(DAY, -1, GETDATE()), 72000, 'PENDING'),
+(1, 1, DATEADD(DAY, -2, GETDATE()), 43000, 'PAID');
+
+-- 9️⃣ Order_Vehicle
+INSERT INTO Order_Vehicle (OrderId, VehicleId, Quantity, UnitPrice) VALUES
+(1, 1, 1, 55000),
+(2, 2, 1, 72000),
+(3, 5, 1, 43000);

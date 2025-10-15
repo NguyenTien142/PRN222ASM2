@@ -10,6 +10,7 @@ namespace Services.DataTransferObject.UserDTO
     {
         public int Id { get; set; }
         public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
         public int RoleId { get; set; }
         public string RoleName { get; set; } = null!;
         public bool IsDeleted { get; set; }
@@ -26,7 +27,6 @@ namespace Services.DataTransferObject.UserDTO
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Phone { get; set; } = null!;
-        public string Email { get; set; } = null!;
         public string Address { get; set; } = null!;
     }
 

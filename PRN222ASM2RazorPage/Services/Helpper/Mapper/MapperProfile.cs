@@ -19,22 +19,21 @@ namespace Services.Helpper.Mapper
                 .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.Dealer, opt => opt.MapFrom(src => src.Dealer));
 
-            // Customer mappings
+            // Customer mappings (email removed since it's now in User table)
             CreateMap<Customer, CustomerInfo>();
 
             // Dealer mappings
             CreateMap<Dealer, DealerInfo>();
 
-            // Register request to User
+            // Register request to User (now includes email)
             CreateMap<RegisterRequest, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
 
-            // Register request to Customer
+            // Register request to Customer (email removed)
             CreateMap<RegisterRequest, Customer>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CustomerName))
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.CustomerPhone))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.CustomerEmail))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.CustomerAddress));
 
             // Register request to Dealer

@@ -17,12 +17,15 @@ namespace Services.DataTransferObject.UserDTO
         public string Password { get; set; } = null!;
 
         [Required]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        public string Email { get; set; } = null!;
+
+        [Required]
         public int RoleId { get; set; }
 
         // Customer specific fields
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
-        public string? CustomerEmail { get; set; }
         public string? CustomerAddress { get; set; }
 
         // Dealer specific fields
