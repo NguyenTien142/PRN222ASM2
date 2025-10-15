@@ -2,18 +2,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Services.Interfaces;
 
-namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
+namespace ElectricVehicleDealerManagermentSystem.Pages.Shared
 {
-    public class LogoutModel : PageModel
+    public class BasePageModel : PageModel
     {
-        private readonly IUserServices _userServices;
+        private readonly IUserServices? _userServices;
 
-        public LogoutModel(IUserServices userServices)
+        public BasePageModel(IUserServices userServices)
         {
             _userServices = userServices;
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public BasePageModel()
+        {
+            // Default constructor for pages that don't need UserServices
+            _userServices = null;
+        }
+
+        public virtual async Task<IActionResult> OnPostLogoutAsync()
         {
             // Get user ID before clearing session
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -21,8 +27,8 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
             // Clear all session data
             HttpContext.Session.Clear();
 
-            // Call logout service if user was logged in
-            if (userId.HasValue)
+            // Call logout service if user was logged in and service is available
+            if (userId.HasValue && _userServices != null)
             {
                 await _userServices.LogoutAsync(userId.Value);
             }
@@ -32,12 +38,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Credential
 
             // Redirect to login page
             return RedirectToPage("/Credential/Login");
-        }
-
-        public async Task<IActionResult> OnPostAsync()
-        {
-            // Handle POST request the same way as GET
-            return await OnGetAsync();
         }
     }
 }

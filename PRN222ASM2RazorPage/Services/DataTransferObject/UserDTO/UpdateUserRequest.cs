@@ -14,11 +14,13 @@ namespace Services.DataTransferObject.UserDTO
 
         public string? Username { get; set; }
         public string? Password { get; set; }
+        
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        public string? Email { get; set; }
 
         // Customer specific fields
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }
-        public string? CustomerEmail { get; set; }
         public string? CustomerAddress { get; set; }
 
         // Dealer specific fields

@@ -1,0 +1,82 @@
+﻿@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Dealer.IndexModel
+@{
+    ViewData["Title"] = "Dealer Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-success text-white mb-4 shadow">
+                <div class="card-body">
+                    <h2 class="card-title mb-3">
+                        Welcome, @Model.DealerName!
+                    </h2>
+                    <p class="card-text">
+                        Logged in as <strong>@Model.Username</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dealer Quick Actions -->
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Manage Inventory</h5>
+                    <p class="text-muted">Add, edit, or remove electric vehicles in your dealership.</p>
+                    <a asp-page="/Dealer/Inventory" class="btn btn-outline-primary">
+                        Go to Inventory
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">View Orders</h5>
+                    <p class="text-muted">Track customer orders and sales activity.</p>
+                    <a asp-page="/Dealer/Orders" class="btn btn-outline-success">
+                        View Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Performance Reports</h5>
+                    <p class="text-muted">Analyze your dealership’s performance and growth trends.</p>
+                    <a asp-page="/Dealer/Reports" class="btn btn-outline-info">
+                        View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dealer Info -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light fw-bold">
+                    Dealer Information
+                </div>
+                <div class="card-body">
+                    <p><strong>Dealer ID:</strong> @Model.DealerId</p>
+                    <p><strong>Dealer Name:</strong> @Model.DealerName</p>
+                    <p><strong>Username:</strong> @Model.Username</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
