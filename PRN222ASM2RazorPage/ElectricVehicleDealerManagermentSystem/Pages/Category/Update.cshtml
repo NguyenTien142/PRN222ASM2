@@ -1,0 +1,74 @@
+﻿@page "/categories/update/{id:int}"
+@model ElectricVehicleDealerManagermentSystem.Pages.Category.UpdateModel
+@{
+    ViewData["Title"] = "Update Category";
+}
+
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Index" class="text-decoration-none">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Category/Index" class="text-decoration-none">
+                            <i class="fas fa-tags"></i> Categories
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-edit"></i> Update Category
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-pen-to-square text-primary me-2"></i> Update Vehicle Category
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <input type="hidden" asp-for="CategoryInput.Id" />
+
+                <!-- Category Name -->
+                <div class="mb-3">
+                    <label asp-for="CategoryInput.Name" class="form-label fw-bold">Category Name</label>
+                    <input asp-for="CategoryInput.Name" class="form-control" placeholder="Enter category name" />
+                    <span asp-validation-for="CategoryInput.Name" class="text-danger"></span>
+                </div>
+
+                <!-- Error Message -->
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a asp-page="./Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Update Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

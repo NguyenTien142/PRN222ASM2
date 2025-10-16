@@ -31,11 +31,11 @@
                 <!-- Nav content -->
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">
                                 <i class="fas fa-home me-1"></i> Home
                             </a>
-                        </li>
+                        </li> *@
 
                         @if (Context.Session.GetInt32("UserId").HasValue)
                         {
@@ -43,13 +43,14 @@
 
                             if (roleName == "customer")
                             {
+
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-page="/Customer/Index">
                                         <i class="fas fa-user me-1"></i> Dashboard
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Vehicles/Browse">
+                                    <a class="nav-link text-dark" asp-page="/Vehicle/Browse">
                                         <i class="fas fa-car me-1"></i> Browse Vehicles
                                     </a>
                                 </li>
@@ -67,26 +68,13 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Dealer/Inventory">
-                                        <i class="fas fa-boxes me-1"></i> Inventory
+                                    <a class="nav-link text-dark" asp-page="/Category/Index">
+                                        <i class="fas fa-car me-1"></i> Manage Category
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Dealer/Orders">
-                                        <i class="fas fa-shopping-cart me-1"></i> Orders
-                                    </a>
-                                </li>
-                            }
-                            else if (roleName == "admin")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Admin/Index">
-                                        <i class="fas fa-user-shield me-1"></i> Admin Dashboard
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Admin/Users">
-                                        <i class="fas fa-users me-1"></i> Manage Users
+                                    <a class="nav-link text-dark" asp-page="/Vehicle/Index">
+                                        <i class="fas fa-car me-1"></i> Manage Vehicle
                                     </a>
                                 </li>
                             }
@@ -165,6 +153,8 @@
     </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SignalR client from CDN (v8) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
