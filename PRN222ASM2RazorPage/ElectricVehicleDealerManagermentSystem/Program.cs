@@ -61,6 +61,7 @@ namespace ElectricVehicleDealerManagermentSystem
             builder.Services.AddScoped<IVehicleServices, VehicleServices>();
             builder.Services.AddScoped<IOrderServices, OrderServices>();
             builder.Services.AddScoped<IUserServices, UserServices>();
+            builder.Services.AddScoped<IVehicleCategoryServices, VehicleCategoryServices>();
 
             var app = builder.Build();
 
@@ -83,7 +84,7 @@ namespace ElectricVehicleDealerManagermentSystem
             app.UseAuthorization();
 
             app.MapRazorPages();
-            app.MapHub<SignalRHub>("/signalrhub");
+            app.MapHub<SignalRHub>("/signalRHub");
 
             app.Run();
         }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Repositories.Model;
 using Services.DataTransferObject.UserDTO;
+using Services.DataTransferObject.VehicleCategoryDTO;
+using Services.DataTransferObject.VehicleDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,18 @@ namespace Services.Helpper.Mapper
                 .ForMember(dest => dest.DealerName, opt => opt.MapFrom(src => src.DealerName))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.DealerAddress))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.DealerQuantity ?? 0));
+
+            // VehicleCategory mappings
+            CreateMap<VehicleCategory, VehicleCategoryResponse>();
+            CreateMap<CreateVehicleCategoryRequest, VehicleCategory>();
+            CreateMap<UpdateVehicleCategoryRequest, VehicleCategory>();
+
+            // Vehicle mappings
+            CreateMap<Vehicle, VehicleResponse>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+            CreateMap<CreateVehicleRequest, Vehicle>()
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
+            CreateMap<UpdateVehicleRequest, Vehicle>();
         }
     }
 }
