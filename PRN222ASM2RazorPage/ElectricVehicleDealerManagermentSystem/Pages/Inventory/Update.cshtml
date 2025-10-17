@@ -1,0 +1,146 @@
+﻿@page "/inventory/update/{vehicleId:int?}"
+@model ElectricVehicleDealerManagermentSystem.Pages.Inventory.UpdateModel
+@{
+    ViewData["Title"] = "Update Inventory";
+}
+
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-light p-2 rounded">
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Index" class="text-decoration-none">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Inventory/Index" class="text-decoration-none">
+                            <i class="fas fa-warehouse"></i> Inventory
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-edit"></i> Update
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h3 class="mb-0">
+                <i class="fas fa-pen text-primary me-2"></i>Update Inventory
+            </h3>
+            <p class="text-muted">Modify the quantity of this vehicle for dealer: <strong>@Model.DealerName</strong></p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Inventory Details -->
+    @if (Model.OriginalInventory != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-car me-2"></i>Vehicle Information
+                </h5>
+            </div>
+            <div class="card-body row g-3 align-items-center">
+                <div class="col-md-3 text-center">
+                    @if (!string.IsNullOrEmpty(Model.OriginalInventory.VehicleImage))
+                    {
+                        <img src="@Model.OriginalInventory.VehicleImage" alt="Vehicle" class="img-fluid rounded shadow-sm" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <div class="border rounded p-4 text-muted">No Image</div>
+                    }
+                </div>
+                <div class="col-md-9">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <strong>Model:</strong> @Model.OriginalInventory.VehicleModel
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Version:</strong> @(string.IsNullOrEmpty(Model.OriginalInventory.VehicleVersion) ? "-" : Model.OriginalInventory.VehicleVersion)
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <strong>Color:</strong> @Model.OriginalInventory.VehicleColor
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Category:</strong> @Model.OriginalInventory.CategoryName
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <strong>Price:</strong> @Model.OriginalInventory.VehiclePrice.ToString("C")
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Manufacture Date:</strong> @Model.OriginalInventory.VehicleManufactureDate.ToString("yyyy-MM-dd")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Form -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-boxes me-2"></i>Update Stock Quantity
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="InventoryInput.VehicleId" />
+                    <input type="hidden" asp-for="InventoryInput.DealerId" />
+
+                    <div class="mb-3">
+                        <label asp-for="InventoryInput.Quantity" class="form-label">
+                            <i class="fas fa-sort-numeric-up me-1"></i>Quantity
+                        </label>
+                        <input asp-for="InventoryInput.Quantity" class="form-control" min="0" />
+                        <span asp-validation-for="InventoryInput.Quantity" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save me-1"></i>Save Changes
+                        </button>
+                        <a asp-page="./Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-4" role="alert">
+            <i class="fas fa-info-circle me-2"></i>No inventory details available for the selected vehicle.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

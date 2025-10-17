@@ -1,42 +1,46 @@
-using ElectricVehicleDealerManagermentSystem.Helpper;
-using ElectricVehicleDealerManagermentSystem.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ElectricVehicleDealerManagermentSystem.Helpper;
+using Services.Interfaces;
+using Services.DataTransferObject.InventoryDTO;
+using Services.DataTransferObject.VehicleCategoryDTO;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
-using Services.DataTransferObject.VehicleCategoryDTO;
-using Services.DataTransferObject.VehicleDTO;
-using Services.Interfaces;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
-namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
+namespace ElectricVehicleDealerManagermentSystem.Pages.Inventory
 {
-    public class IndexModel : BasePageModel
+    public class InventoryModel : BasePageModel
     {
-        private readonly IVehicleServices _vehicleServices;
+        private readonly IDealerServices _dealerServices;
         private readonly IVehicleCategoryServices _categoryServices;
         private readonly IHubContext<SignalRHub> _hubContext;
 
-        public IndexModel(IUserServices userServices, IVehicleServices vehicleServices, IVehicleCategoryServices categoryServices, IHubContext<SignalRHub> hubContext)
+        public InventoryModel(IUserServices userServices, IDealerServices dealerServices, 
+            IVehicleCategoryServices categoryServices, IHubContext<SignalRHub> hubContext)
             : base(userServices)
         {
-            _vehicleServices = vehicleServices;
+            _dealerServices = dealerServices;
             _categoryServices = categoryServices;
             _hubContext = hubContext;
         }
 
-        public IList<VehicleResponse> Vehicles { get; set; } = new List<VehicleResponse>();
+        public IList<InventoryResponse> InventoryItems { get; set; } = new List<InventoryResponse>();
         public IList<VehicleCategoryResponse> Categories { get; set; } = new List<VehicleCategoryResponse>();
+        
         public string ErrorMessage { get; set; } = string.Empty;
         public string SuccessMessage { get; set; } = string.Empty;
+        public int? DealerId { get; set; }
+        public string DealerName { get; set; } = string.Empty;
 
         [BindProperty(SupportsGet = true)]
         public int? CategoryFilter { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public bool ShowDeleted { get; set; } = false;
+        public string SearchTerm { get; set; } = string.Empty;
 
         [BindProperty(SupportsGet = true)]
-        public string SearchTerm { get; set; } = string.Empty;
+        public bool ShowOutOfStock { get; set; } = true;
 
         public SelectList CategorySelectList { get; set; } = new SelectList(new List<object>());
 
@@ -57,6 +61,16 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 return RedirectToPage("/Index");
             }
 
+            // Get dealer information
+            DealerId = HttpContext.Session.GetInt32("DealerId");
+            DealerName = HttpContext.Session.GetString("DealerName") ?? "Unknown Dealer";
+
+            if (!DealerId.HasValue)
+            {
+                TempData["ErrorMessage"] = "Dealer information not found. Please log in again.";
+                return RedirectToPage("/Credential/Login");
+            }
+
             await LoadDataAsync();
 
             // Check for temp data messages
@@ -72,16 +86,23 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
             return Page();
         }
 
-        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        public async Task<IActionResult> OnPostRemoveFromInventoryAsync(int vehicleId)
         {
+            // Get dealer information from session
+            var dealerId = HttpContext.Session.GetInt32("DealerId");
+            if (!dealerId.HasValue)
+            {
+                TempData["ErrorMessage"] = "Dealer information not found. Please log in again.";
+                return RedirectToPage("/Credential/Login");
+            }
+
             try
             {
-                var result = await _vehicleServices.SoftDeleteVehicleAsync(id);
+                var result = await _dealerServices.RemoveFromInventoryAsync(vehicleId, dealerId.Value);
                 
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = result.Message;
-
                     await _hubContext.Clients.All.SendAsync("LoadAllItems");
                 }
                 else
@@ -91,32 +112,7 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while deleting the vehicle: " + ex.Message;
-            }
-
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnPostRestoreAsync(int id)
-        {
-            try
-            {
-                var result = await _vehicleServices.RestoreVehicleAsync(id);
-                
-                if (result.Success)
-                {
-                    TempData["SuccessMessage"] = result.Message;
-
-                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = result.Message;
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "An error occurred while restoring the vehicle: " + ex.Message;
+                TempData["ErrorMessage"] = "An error occurred while removing from inventory: " + ex.Message;
             }
 
             return RedirectToPage();
@@ -125,7 +121,54 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
         private async Task LoadDataAsync()
         {
             await LoadCategoriesAsync();
-            await LoadVehiclesAsync();
+            await LoadInventoryAsync();
+        }
+
+        private async Task LoadInventoryAsync()
+        {
+            if (!DealerId.HasValue) return;
+
+            try
+            {
+                var result = await _dealerServices.GetDealerInventoryAsync(DealerId.Value);
+                if (result.Success && result.Data != null)
+                {
+                    var inventory = result.Data.ToList();
+
+                    // Apply filters
+                    if (CategoryFilter.HasValue)
+                    {
+                        inventory = inventory.Where(i => i.CategoryId == CategoryFilter.Value).ToList();
+                    }
+
+                    if (!string.IsNullOrEmpty(SearchTerm))
+                    {
+                        inventory = inventory.Where(i => 
+                            i.VehicleModel.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            i.VehicleColor.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            (!string.IsNullOrEmpty(i.VehicleVersion) && i.VehicleVersion.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                            i.CategoryName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+                        ).ToList();
+                    }
+
+                    if (!ShowOutOfStock)
+                    {
+                        inventory = inventory.Where(i => i.Quantity > 0).ToList();
+                    }
+
+                    InventoryItems = inventory;
+                }
+                else
+                {
+                    ErrorMessage = result.Message;
+                    InventoryItems = new List<InventoryResponse>();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "An error occurred while loading inventory: " + ex.Message;
+                InventoryItems = new List<InventoryResponse>();
+            }
         }
 
         private async Task LoadCategoriesAsync()
@@ -155,56 +198,8 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
             }
             catch (Exception ex)
             {
-                ErrorMessage = "An error occurred while loading categories: " + ex.Message;
                 Categories = new List<VehicleCategoryResponse>();
                 CategorySelectList = new SelectList(new List<SelectListItem>());
-            }
-        }
-
-        private async Task LoadVehiclesAsync()
-        {
-            try
-            {
-                var result = await _vehicleServices.GetAllVehiclesAsync(ShowDeleted);
-                if (result.Success && result.Data != null)
-                {
-                    var vehicles = result.Data.ToList();
-
-                    // Apply category filter
-                    if (CategoryFilter.HasValue)
-                    {
-                        vehicles = vehicles.Where(v => v.CategoryId == CategoryFilter.Value).ToList();
-                    }
-
-                    // Apply search filter
-                    if (!string.IsNullOrEmpty(SearchTerm))
-                    {
-                        vehicles = vehicles.Where(v => 
-                            v.Model.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            v.Color.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            (!string.IsNullOrEmpty(v.Version) && v.Version.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                            v.CategoryName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
-                        ).ToList();
-                    }
-
-                    Vehicles = vehicles;
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(ErrorMessage))
-                        ErrorMessage += " " + result.Message;
-                    else
-                        ErrorMessage = result.Message;
-                    Vehicles = new List<VehicleResponse>();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!string.IsNullOrEmpty(ErrorMessage))
-                    ErrorMessage += " An error occurred while loading vehicles: " + ex.Message;
-                else
-                    ErrorMessage = "An error occurred while loading vehicles: " + ex.Message;
-                Vehicles = new List<VehicleResponse>();
             }
         }
     }

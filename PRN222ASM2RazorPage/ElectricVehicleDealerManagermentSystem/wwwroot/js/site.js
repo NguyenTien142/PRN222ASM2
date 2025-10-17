@@ -2,9 +2,12 @@
     window.signalRSetupInitialized = true;
 
     const currentPath = window.location.pathname.toLowerCase();
-    const isOnCategoryIndex = currentPath === "/category/index" || currentPath === "/category" || currentPath === "/categories";
+    const isOnCategoryIndex = currentPath === "/category/index" || currentPath === "/category";
+    const isOnVehicleIndex = currentPath === "/vehicle/index" || currentPath === "/vehicle";
+    const isOnVehicleBrowse = currentPath === "/vehicle/browse";
+    const isOnInventoryIndex = currentPath === "/inventory" || currentPath === "/inventory/index";
 
-    if (isOnCategoryIndex) {
+    if (isOnCategoryIndex || isOnVehicleIndex || isOnVehicleBrowse || isOnInventoryIndex) {
         if (typeof signalR === 'undefined' || !signalR.HubConnectionBuilder) {
             console.warn('SignalR client not loaded');
         } else {
@@ -20,7 +23,7 @@
 
             connection.start()
                 .then(function () {
-                    console.log("SignalR connected for Category Index");
+                    console.log("SignalR connected for realtime updates on", currentPath);
                 })
                 .catch(function (err) {
                     console.error("SignalR connection error:", err.toString());

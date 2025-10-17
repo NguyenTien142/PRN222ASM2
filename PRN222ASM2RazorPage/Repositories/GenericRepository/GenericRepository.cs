@@ -125,7 +125,6 @@ namespace Repositories.GenericRepository
             var entity = await _dbSet.FindAsync(id);
             if (entity == null) return false;
 
-            // Check for IsDeleted property (used by User, Product, Category entities)
             var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
             if (isDeletedProperty != null && isDeletedProperty.PropertyType == typeof(bool))
             {
@@ -134,7 +133,6 @@ namespace Repositories.GenericRepository
                 return await _context.SaveChangesAsync() > 0;
             }
 
-            // Check for IsDelete property (alternative naming)
             var isDeleteProperty = entity.GetType().GetProperty("IsDelete");
             if (isDeleteProperty != null && isDeleteProperty.PropertyType == typeof(bool?))
             {
@@ -143,7 +141,7 @@ namespace Repositories.GenericRepository
                 return await _context.SaveChangesAsync() > 0;
             }
 
-            return false; // Entity doesn't support soft delete
+            return false;
         }
 
         public async Task DeleteRangeAsync(IEnumerable<TKey> ids)

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ElectricVehicleDealerManagermentSystem.Pages.Shared;
 using Services.Interfaces;
 using Services.DataTransferObject.VehicleCategoryDTO;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.SignalR;
 using ElectricVehicleDealerManagermentSystem.SignalR;
+using ElectricVehicleDealerManagermentSystem.Helpper;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Category
 {
