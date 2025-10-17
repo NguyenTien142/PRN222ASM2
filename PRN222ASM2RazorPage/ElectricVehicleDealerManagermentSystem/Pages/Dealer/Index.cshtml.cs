@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ElectricVehicleDealerManagermentSystem.Pages.Shared;
 using Services.Interfaces;
+using ElectricVehicleDealerManagermentSystem.Helpper;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Dealer
 {

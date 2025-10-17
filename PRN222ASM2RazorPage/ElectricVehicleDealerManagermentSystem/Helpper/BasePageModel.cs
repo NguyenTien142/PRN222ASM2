@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Services.Interfaces;
 
-namespace ElectricVehicleDealerManagermentSystem.Pages.Shared
+namespace ElectricVehicleDealerManagermentSystem.Helpper
 {
     public class BasePageModel : PageModel
     {

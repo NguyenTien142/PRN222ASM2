@@ -1,0 +1,124 @@
+﻿@page "/inventory/create"
+@model ElectricVehicleDealerManagermentSystem.Pages.Inventory.CreateModel
+@{
+    ViewData["Title"] = "Add to Inventory";
+}
+
+<div class="container mt-4">
+    <!-- Breadcrumb Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-light p-2 rounded">
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Index" class="text-decoration-none text-primary">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Inventory/Index" class="text-decoration-none text-primary">
+                            Inventory
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-dark" aria-current="page">
+                        Add to Inventory
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h3 class="fw-bold text-primary mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Add Vehicle to Inventory
+            </h3>
+            <p class="text-muted mb-0">Dealer: @Model.DealerName</p>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Category Filter -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Vehicles</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" id="filterForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label asp-for="CategoryFilter" class="form-label fw-semibold">
+                            <i class="fas fa-tags me-1"></i>Category
+                        </label>
+                        <select asp-for="CategoryFilter" asp-items="Model.CategorySelectList" class="form-select" id="categoryFilter">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 align-self-end">
+                        <button type="submit" class="btn btn-outline-info">
+                            <i class="fas fa-filter me-1"></i>Apply Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Inventory Form -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-car me-2"></i>Add Vehicle to Inventory
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label asp-for="InventoryInput.VehicleId" class="form-label fw-semibold">
+                            <i class="fas fa-car-side me-1"></i>Vehicle
+                        </label>
+                        <select asp-for="InventoryInput.VehicleId" asp-items="Model.VehicleSelectList" class="form-select" required>
+                            <option value="">-- Select Vehicle --</option>
+                        </select>
+                        <span asp-validation-for="InventoryInput.VehicleId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="InventoryInput.Quantity" class="form-label fw-semibold">
+                            <i class="fas fa-boxes me-1"></i>Quantity
+                        </label>
+                        <input asp-for="InventoryInput.Quantity" type="number" min="1" class="form-control" placeholder="Enter quantity" required />
+                        <span asp-validation-for="InventoryInput.Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-page="/Inventory/Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Add to Inventory
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
