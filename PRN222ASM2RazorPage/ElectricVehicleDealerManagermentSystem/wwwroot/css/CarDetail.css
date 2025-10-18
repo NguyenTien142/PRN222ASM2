@@ -1,0 +1,459 @@
+/* General Styles */
+body {
+    background-color: #f0f2f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container-fluid {
+    max-width: 1400px;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Header Section */
+.car-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.car-id {
+    font-size: 0.813rem;
+    color: #999;
+    letter-spacing: 0.3px;
+}
+
+/* Status Box - Like in the image */
+.status-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.status-icon-box {
+    width: 40px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.status-icon-box i {
+    font-size: 1.25rem;
+    color: #999;
+}
+
+.status-details {
+    flex: 1;
+}
+
+.status-label-top {
+    display: block;
+    font-size: 0.813rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+
+.status-progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-progress-wrapper .progress {
+    flex: 1;
+    background-color: #e8e8e8;
+    border-radius: 2px;
+}
+
+.status-percent {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 45px;
+    text-align: right;
+}
+
+/* Car Image Container */
+.car-image-container-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+}
+
+.car-image-container-top img {
+    max-width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+}
+
+/* Dashboard Section */
+.dashboard-section {
+    padding: 1rem;
+}
+
+.dashboard-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f0f0f0;
+}
+
+.dashboard-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-groups {
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 1rem;
+}
+
+.dashboard-group-label {
+    color: #999;
+}
+
+.dashboard-group-value {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.dashboard-tags {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.dashboard-tag {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background-color: #f5f5f7;
+    border: 1px solid #e5e5e7;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.dashboard-info {
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dashboard-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+}
+
+.dashboard-info-label {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.dashboard-info-value {
+    font-size: 0.813rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.dashboard-buttons {
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dashboard-btn-buy {
+    background-color: #007aff;
+    border-color: #007aff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+}
+
+.dashboard-btn-buy:hover {
+    background-color: #0051d5;
+    border-color: #0051d5;
+}
+
+.dashboard-btn-appointment {
+    border-color: #007aff;
+    color: #007aff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+}
+
+.dashboard-btn-appointment:hover {
+    background-color: #007aff;
+    border-color: #007aff;
+    color: white;
+}
+
+/* Map Container */
+.map-container {
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #e5e5e7;
+}
+
+/* Map Container Combined (with Activity below) */
+.map-container-combined {
+    height: 250px;
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+    background-color: #e5e5e7;
+}
+
+/* Map Container Horizontal (side by side with specs) */
+.map-container-horizontal {
+    height: 100%;
+    min-height: 200px;
+    border-radius: 12px 0 0 12px;
+    overflow: hidden;
+    background-color: #e5e5e7;
+}
+
+.specs-horizontal {
+    background-color: white;
+    border-radius: 0 12px 12px 0;
+    height: 100%;
+    min-height: 200px;
+}
+
+/* Activity Chart */
+#activityChart {
+    max-height: 150px;
+    height: 150px;
+}
+
+.card-body canvas {
+    width: 100% !important;
+    height: 250px !important;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.section-subtitle {
+    font-size: 0.938rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Specifications - New Compact Style */
+.specs-section {
+    padding-bottom: 1rem;
+}
+
+.spec-item-new {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.spec-dot {
+    font-size: 0.375rem;
+    color: #ccc;
+    margin-top: 0.4rem;
+    flex-shrink: 0;
+}
+
+.spec-label-new {
+    display: inline;
+    font-size: 0.75rem;
+    color: #999;
+    margin-right: 0.25rem;
+}
+
+.spec-value-new {
+    display: inline;
+    font-size: 0.875rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+/* Reminder Lists */
+.reminder-list {
+    margin-top: 1rem;
+}
+
+.reminder-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reminder-badge {
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+    border: 2px solid #007aff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.reminder-badge i {
+    font-size: 0.875rem;
+    color: #007aff;
+}
+
+.reminder-content {
+    flex: 1;
+}
+
+.reminder-km {
+    display: block;
+    font-size: 0.875rem;
+    color: #1a1a1a;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.reminder-date-text {
+    display: block;
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 0.125rem;
+}
+
+/* View All Link - Small */
+.view-all-link-small {
+    font-size: 0.75rem;
+    color: #007aff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all-link-small:hover {
+    color: #0051d5;
+    text-decoration: underline;
+}
+
+/* Add Reminder Button */
+.add-reminder-btn {
+    border-color: #d1d1d6;
+    color: #1a1a1a;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.add-reminder-btn:hover {
+    background-color: #f5f5f7;
+    border-color: #d1d1d6;
+    color: #1a1a1a;
+}
+
+/* Divider */
+hr {
+    border-color: #e8e8e8;
+    opacity: 1;
+}
+
+/* View All Link */
+.view-all-link {
+    font-size: 0.813rem;
+    color: #007aff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all-link:hover {
+    color: #0051d5;
+    text-decoration: underline;
+}
+
+/* Card Title */
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Add Button */
+.add-btn {
+    border-color: #d1d1d6;
+    color: #1a1a1a;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.add-btn:hover {
+    background-color: #f5f5f7;
+    border-color: #d1d1d6;
+    color: #1a1a1a;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .car-title {
+        font-size: 1.25rem;
+    }
+
+    .car-image-container-top {
+        min-height: 180px;
+        margin-top: 1rem;
+    }
+
+    .map-container {
+        height: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .status-box {
+        margin-bottom: 1rem;
+    }
+
+    .map-container {
+        height: 200px;
+    }
+}
+
+/* Leaflet Map Customization */
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* Chart Customization */
+canvas {
+    max-width: 100%;
+}
