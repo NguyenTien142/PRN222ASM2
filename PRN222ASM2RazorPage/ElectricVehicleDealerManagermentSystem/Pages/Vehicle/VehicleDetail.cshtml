@@ -20,11 +20,21 @@
         </div>
     </div>
 
+    <!-- Success Message -->
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Error Message -->
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
@@ -204,7 +214,6 @@
                                 <img src="https://randomuser.me/api/portraits/men/32.jpg"
                                      alt="User"
                                      class="dashboard-avatar mb-2">
-                                <h6 class="dashboard-name mb-1">@Model.GetUserDisplayName()</h6>
                                 <div class="dashboard-groups mb-3">
                                     <span class="dashboard-group-label">Group:</span>
                                     <span class="dashboard-group-value">@(Model.UserRole?.ToUpper() ?? "GUEST")</span>
@@ -246,27 +255,23 @@
                                     {
                                         @if (Model.UserRole == "customer")
                                         {
-                                            <button class="btn btn-primary w-100 mb-2 dashboard-btn-buy">
+                                            <form method="post"  asp-page-handler="Buy">
+                                                @{
+                                                    var price = Model.Vehicle.Price.ToString("C");
+                                                }
+                                                <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+                                            <button type="submit"
+                                                class="btn btn-primary w-100 dashboard-btn-buy"
+                                                        onclick="return confirm('Are you sure you want to purchase this vehicle for @price?')">
                                                 <i class="bi bi-cart-check me-2"></i>Buy
                                             </button>
+                                            </form>
                                             <button class="btn btn-outline-primary w-100 dashboard-btn-appointment">
                                                 <i class="bi bi-calendar-check me-2"></i>Appointment
                                             </button>
                                         }
 
-                                        @if (Model.CanEditVehicle())
-                                        {
-                                            <a asp-page="/Vehicle/Update" asp-route-id="@Model.Vehicle.Id" class="btn btn-success w-100 mb-2">
-                                                <i class="fas fa-edit me-2"></i>Edit Vehicle
-                                            </a>
-                                        }
-
-                                        @if (Model.CanDeleteVehicle())
-                                        {
-                                            <a asp-page="/Vehicle/Delete" asp-route-id="@Model.Vehicle.Id" class="btn btn-danger w-100 mb-2">
-                                                <i class="fas fa-trash me-2"></i>Delete Vehicle
-                                            </a>
-                                        }
+                                        
                                     }
                                     else
                                     {
