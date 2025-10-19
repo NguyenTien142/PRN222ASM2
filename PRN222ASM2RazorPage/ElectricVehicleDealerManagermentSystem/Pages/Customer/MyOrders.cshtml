@@ -1,0 +1,361 @@
+@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Customer.MyOrdersModel
+@{
+    ViewData["Title"] = "My Orders";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-paid {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-done {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+        
+        .order-item {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .order-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .vehicle-image {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .order-header {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .order-id {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        
+        .price-highlight {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .delivery-status {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        
+        .btn-mark-done {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-mark-done:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+        
+        .summary-cards {
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            border-radius: 10px;
+            border: none;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .debug-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-shopping-bag text-primary me-2"></i>
+                My Orders
+            </h2>
+            <p class="text-muted mb-0">Track your order history and delivery status</p>
+        </div>
+        <a asp-page="/Customer/Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Debug Information - Hidden in production -->
+    @if (false && !string.IsNullOrEmpty(Model.DebugMessage))
+    {
+        <div class="debug-info">
+            <h6><i class="fas fa-info-circle me-2"></i>Debug Information</h6>
+            <p class="mb-0">@Model.DebugMessage</p>
+            <p class="mb-0"><strong>Session Info:</strong></p>
+            <p class="mb-0">Customer ID: @(HttpContext.Session.GetInt32("CustomerId"))</p>
+            <p class="mb-0">User ID: @(HttpContext.Session.GetInt32("UserId"))</p>
+            <p class="mb-0">Role: @(HttpContext.Session.GetString("RoleName"))</p>
+        </div>
+    }
+
+    <!-- Orders Summary -->
+    <div class="row summary-cards">
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #ffc107, #ff8f00);">
+                <h4>@Model.MyOrders.Count(o => o.Status == "PENDING")</h4>
+                <p class="mb-0">Pending Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                <h4>@Model.MyOrders.Count(o => o.Status == "PAID")</h4>
+                <p class="mb-0">Being Delivered</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #6c757d, #495057);">
+                <h4>@Model.MyOrders.Count(o => o.Status == "DONE")</h4>
+                <p class="mb-0">Completed</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #007bff, #0056b3);">
+                <h4>@Model.MyOrders.Count</h4>
+                <p class="mb-0">Total Orders</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders List -->
+    @if (Model.MyOrders.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                @foreach (var order in Model.MyOrders)
+                {
+                    <div class="order-item">
+                        <!-- Order Header -->
+                        <div class="order-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <span class="order-id me-3">Order #@order.Id.ToString().PadLeft(6, '0')</span>
+                                        <span class="status-badge status-@order.Status.ToLower()">
+                                            @order.Status
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <div class="price-highlight">@order.TotalAmount.ToString("C")</div>
+                                    <small class="text-muted d-block">@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Content -->
+                        <div class="p-3">
+                            <div class="row align-items-center">
+                                <!-- Vehicle Info -->
+                                <div class="col-md-6">
+                                    @if (order.OrderVehicles?.Any() == true)
+                                    {
+                                        var vehicle = order.OrderVehicles.First().Vehicle;
+                                        <div class="d-flex align-items-center">
+                                            <img src="@(string.IsNullOrEmpty(vehicle?.Image) ? "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=200" : vehicle.Image)"
+                                                 alt="@(vehicle?.Model ?? "Vehicle")"
+                                                 class="vehicle-image me-3" />
+                                            <div>
+                                                <h6 class="mb-1">@(vehicle?.Model ?? "Unknown Vehicle")</h6>
+                                                <p class="text-muted mb-0">
+                                                    <small>@(vehicle?.Color ?? "Unknown") • @(vehicle?.CategoryName ?? "Unknown")</small>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    <small><strong>Unit Price:</strong> @order.OrderVehicles.First().UnitPrice.ToString("C")</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">No vehicle information available</div>
+                                    }
+                                </div>
+
+                                <!-- Status & Actions -->
+                                <div class="col-md-6 text-md-end">
+                                    @if (order.Status == "PENDING")
+                                    {
+                                        <div class="mb-2">
+                                            <i class="fas fa-clock text-warning me-2"></i>
+                                            <span class="text-muted">Waiting for payment processing...</span>
+                                        </div>
+                                    }
+                                    else if (order.Status == "PAID")
+                                    {
+                                        <div class="mb-2">
+                                            <span class="delivery-status">
+                                                <i class="fas fa-truck me-2"></i>Being Delivered
+                                            </span>
+                                        </div>
+                                        <form method="post" asp-page-handler="MarkAsDone" class="d-inline">
+                                            <input type="hidden" name="OrderId" value="@order.Id" />
+                                            <input type="hidden" name="__RequestVerificationToken" value="@Html.AntiForgeryToken()" />
+                                            <button type="submit" 
+                                                    class="btn btn-mark-done"
+                                                    onclick="return confirm('Confirm that you have received your vehicle?')">
+                                                <i class="fas fa-check me-1"></i> Mark as Done
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (order.Status == "DONE")
+                                    {
+                                        <div class="text-success">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong>Order Completed</strong>
+                                            <br>
+                                            <small class="text-muted">Thank you for your purchase!</small>
+                                        </div>
+                                    }
+                                    else if (order.Status == "CANCELLED")
+                                    {
+                                        <div class="text-danger">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            <strong>Order Cancelled</strong>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Dealer Info -->
+                            @if (order.Dealer != null)
+                            {
+                                <div class="border-top pt-3 mt-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Dealer Information:</small>
+                                            <div>
+                                                <strong>@order.Dealer.DealerName</strong>
+                                                <br>
+                                                <small class="text-muted">@order.Dealer.Address</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-shopping-bag"></i>
+            <h4>No Orders Yet</h4>
+            <p class="mb-4">You haven't placed any orders yet. Start shopping to see your orders here!</p>
+            <a asp-page="/Vehicle/Browse" class="btn btn-primary">
+                <i class="fas fa-car me-2"></i>Browse Vehicles
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    </script>
+}
