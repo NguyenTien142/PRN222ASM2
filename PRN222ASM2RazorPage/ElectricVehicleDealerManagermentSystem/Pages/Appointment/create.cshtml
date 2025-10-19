@@ -5,7 +5,6 @@
 }
 
 <div class="container mt-4">
-    <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-success">
@@ -18,7 +17,6 @@
         </a>
     </div>
 
-    <!-- Success / Error Messages -->
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <div class="alert alert-danger">@Model.ErrorMessage</div>
@@ -28,7 +26,6 @@
         <div class="alert alert-success">@Model.SuccessMessage</div>
     }
 
-    <!-- Create Appointment Form -->
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
             <i class="fas fa-calendar-plus me-2"></i>Appointment Details
@@ -36,36 +33,28 @@
         <div class="card-body">
             <form method="post">
                 <div class="row g-3">
-                    <!-- Vehicle Selection -->
                     <div class="col-md-6">
                         <label asp-for="NewAppointment.VehicleId" class="form-label fw-semibold">
                             <i class="fas fa-car me-1"></i>Vehicle
                         </label>
-                        <select asp-for="NewAppointment.VehicleId" asp-items="Model.VehicleSelectList" class="form-select"></select>
+                        <select asp-for="NewAppointment.VehicleId" asp-items="Model.VehicleSelectList" class="form-select" id="vehicleSelect"></select>
                         <span asp-validation-for="NewAppointment.VehicleId" class="text-danger"></span>
                     </div>
 
-                    <!-- Date Selection -->
                     <div class="col-md-6">
-                        <label for="AppointmentDate" class="form-label fw-semibold">
-                            <i class="fas fa-calendar-day me-1"></i>Appointment Date
+                        <label asp-for="NewAppointment.AppointmentDate" class="form-label fw-semibold">
+                            <i class="fas fa-clock me-1"></i>Selected Slot
                         </label>
-                        <input asp-for="NewAppointment.AppointmentDate" type="datetime-local" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                        <input asp-for="NewAppointment.AppointmentDate" type="datetime-local" class="form-control" readonly />
                         <span asp-validation-for="NewAppointment.AppointmentDate" class="text-danger"></span>
-                    </div>
-
-                    <!-- Time Slot Suggestion (Optional, dynamically loaded via AJAX) -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">
-                            <i class="fas fa-clock me-1"></i>Available Time Slots
-                        </label>
-                        <select id="timeSlotSelect" class="form-select">
-                            <option value="">-- Select a Date First --</option>
-                        </select>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
+                <div class="mt-4">
+                    <h5 class="fw-semibold mb-3"><i class="fas fa-calendar-alt me-2"></i>Select Available Time Slot</h5>
+                    <div id="calendar"></div>
+                </div>
+
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-success px-4">
                         <i class="fas fa-save me-1"></i>Book Appointment
@@ -79,43 +68,76 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
+    <!-- ✅ FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const vehicleSelect = document.getElementById('vehicleSelect');
             const dateInput = document.querySelector("input[name='NewAppointment.AppointmentDate']");
-            const timeSlotSelect = document.getElementById("timeSlotSelect");
 
-            // When date changes, fetch available time slots
-            dateInput.addEventListener("change", function () {
-                const dateValue = this.value.split('T')[0]; // Only date part
-                if (!dateValue) return;
+            let calendar;
 
-                fetch(`/appointment/create?handler=AvailableTimeSlots&date=${dateValue}`)
+            function initCalendar() {
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 700,
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    eventClick: function (info) {
+                        // ✅ Convert UTC to local time (GMT+7)
+                        const utcDate = new Date(info.event.start);
+                        const localDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000)); // add +7 hours
+                        const localISO = localDate.toISOString().slice(0, 16);
+
+                        dateInput.value = localISO;
+                        alert(`Selected slot: ${info.event.title} on ${localDate.toLocaleString()}`);
+                    }
+                });
+                calendar.render();
+            }
+
+            function loadAvailableSlots(vehicleId) {
+                if (!vehicleId) return;
+
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth() + 1;
+
+                fetch(`/appointment/create?handler=MonthlyCalendar&year=${year}&month=${month}`)
                     .then(res => res.json())
                     .then(data => {
-                        timeSlotSelect.innerHTML = "";
-                        if (data.length === 0) {
-                            const option = document.createElement("option");
-                            option.text = "No available time slots for this date.";
-                            timeSlotSelect.add(option);
-                        } else {
-                            data.forEach(slot => {
-                                const option = document.createElement("option");
-                                option.value = slot.value;
-                                option.text = slot.text;
-                                timeSlotSelect.add(option);
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error loading time slots:", err);
-                    });
-            });
+                        calendar.removeAllEvents();
 
-            // When a time slot is chosen, update AppointmentDate
-            timeSlotSelect.addEventListener("change", function () {
-                if (this.value) {
-                    dateInput.value = this.value;
-                }
+                        data.days.forEach(day => {
+                            if (day.hasSlots) {
+                                day.slots.forEach(slot => {
+                                    // Convert server UTC time to local before adding event
+                                    const utcSlot = new Date(slot.value);
+                                    const localSlot = new Date(utcSlot.getTime());
+
+                                    calendar.addEvent({
+                                        title: slot.time,
+                                        start: localSlot.toISOString(),
+                                        backgroundColor: '#198754',
+                                        borderColor: '#198754'
+                                    });
+                                });
+                            }
+                        });
+                    })
+                    .catch(err => console.error('Error loading calendar slots:', err));
+            }
+
+            initCalendar();
+
+            vehicleSelect.addEventListener('change', function () {
+                loadAvailableSlots(this.value);
             });
         });
     </script>

@@ -487,8 +487,10 @@ namespace Services.Implements
                 // Check if appointment is within the allowed time range (can start up to 30 minutes before appointment time)
                 var currentTime = DateTime.Now;
                 var appointmentTime = appointment.AppointmentDate;
-                var startWindow = appointmentTime.AddMinutes(-30); // Allow starting 30 minutes early
-                var endWindow = appointmentTime.AddHours(2); // Allow starting up to 2 hours after appointment time
+                //var startWindow = appointmentTime.AddMinutes(-30); // Allow starting 30 minutes early
+                //var endWindow = appointmentTime.AddHours(2); // Allow starting up to 2 hours after appointment time
+                var startWindow = appointmentTime;
+                var endWindow = appointmentTime.AddHours(1);
 
                 if (currentTime < startWindow)
                 {
@@ -586,7 +588,7 @@ namespace Services.Implements
 
                 // Get all APPROVED appointments that have passed their appointment date
                 var expiredAppointments = await appointmentRepository.GetAllAsync(
-                    a => a.Status == STATUS_APPROVE && a.AppointmentDate < DateTime.Now
+                    a => a.Status == STATUS_APPROVE && a.AppointmentDate.AddHours(1) < DateTime.Now
                 );
 
                 if (!expiredAppointments.Any())
@@ -636,7 +638,7 @@ namespace Services.Implements
         /// <returns>True if the appointment should be expired</returns>
         private bool ShouldExpireAppointment(Appointment appointment)
         {
-            return appointment.Status == STATUS_APPROVE && appointment.AppointmentDate < DateTime.Now;
+            return appointment.Status == STATUS_APPROVE && appointment.AppointmentDate.AddHours(1) < DateTime.Now;
         }
 
         #region Private Helper Methods
