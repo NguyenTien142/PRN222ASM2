@@ -36,6 +36,8 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
         // Time slot properties
         public List<DateTime> AvailableTimeSlots { get; set; } = new List<DateTime>();
         public DateTime SelectedDate { get; set; } = DateTime.Today;
+        public Dictionary<DateTime, List<DateTime>> MonthlyAvailableSlots { get; set; } = new Dictionary<DateTime, List<DateTime>>();
+        public DateTime CurrentMonth { get; set; } = DateTime.Today;
 
         // Properties for messages
         public string SuccessMessage { get; set; } = string.Empty;
@@ -124,7 +126,7 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
         public async Task<IActionResult> OnGetAvailableTimeSlotsAsync(DateTime date)
         {
             // Generate available time slots for the selected date
-            var timeSlots = GenerateAvailableTimeSlots(date);
+            var timeSlots = await GenerateAvailableTimeSlotsAsync(date);
             
             return new JsonResult(timeSlots.Select(t => new { 
                 value = t.ToString("yyyy-MM-ddTHH:mm"),
@@ -132,10 +134,55 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
             }));
         }
 
+        public async Task<IActionResult> OnGetAvailableTimeSlotsForVehicleAsync(DateTime date, int vehicleId)
+        {
+            // Generate available time slots for the selected date and vehicle
+            var timeSlots = await GenerateAvailableTimeSlotsAsync(date, vehicleId);
+            
+            return new JsonResult(timeSlots.Select(t => new { 
+                value = t.ToString("yyyy-MM-ddTHH:mm"),
+                text = t.ToString("HH:mm")
+            }));
+        }
+
+        public async Task<IActionResult> OnGetMonthlyCalendarAsync(int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+            var calendarData = new List<object>();
+
+            for (var date = startDate; date <= endDate; date = date.AddDays(1))
+            {
+                var availableSlots = await GenerateAvailableTimeSlotsAsync(date);
+                calendarData.Add(new
+                {
+                    date = date.ToString("yyyy-MM-dd"),
+                    dayOfMonth = date.Day,
+                    isToday = date.Date == DateTime.Today,
+                    isPast = date.Date < DateTime.Today,
+                    hasSlots = availableSlots.Any(),
+                    slotsCount = availableSlots.Count,
+                    slots = availableSlots.Select(s => new
+                    {
+                        time = s.ToString("HH:mm"),
+                        value = s.ToString("yyyy-MM-ddTHH:mm")
+                    }).ToList()
+                });
+            }
+
+            return new JsonResult(new
+            {
+                year = year,
+                month = month,
+                monthName = startDate.ToString("MMMM yyyy"),
+                days = calendarData
+            });
+        }
+
         private async Task LoadDataAsync()
         {
             await LoadVehiclesAsync();
-            GenerateTimeSlots();
+            await GenerateTimeSlotsAsync();
         }
 
         private async Task LoadVehiclesAsync()
@@ -169,12 +216,18 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
             }
         }
 
+        private async Task GenerateTimeSlotsAsync()
+        {
+            AvailableTimeSlots = await GenerateAvailableTimeSlotsAsync(SelectedDate);
+        }
+
         private void GenerateTimeSlots()
         {
+            // Synchronous wrapper for backward compatibility
             AvailableTimeSlots = GenerateAvailableTimeSlots(SelectedDate);
         }
 
-        private List<DateTime> GenerateAvailableTimeSlots(DateTime date)
+        private async Task<List<DateTime>> GenerateAvailableTimeSlotsAsync(DateTime date, int? vehicleId = null)
         {
             var timeSlots = new List<DateTime>();
             
@@ -186,20 +239,79 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
             var startTime = date.Date.AddHours(9);
             var endTime = date.Date.AddHours(18);
 
+            // Get existing appointments for the date (and optionally for specific vehicle)
+            var existingAppointments = await GetExistingAppointmentsForDateAsync(date, vehicleId);
+
             for (var time = startTime; time < endTime; time = time.AddHours(1))
             {
-                // Skip if the time slot is in the past
-                if (time <= DateTime.Now)
+                // Skip if the time slot is in the past (for today only)
+                if (date.Date == DateTime.Today && time <= DateTime.Now.AddMinutes(30))
                     continue;
 
                 // Skip lunch hour (12 PM - 1 PM)
                 if (time.Hour == 12)
                     continue;
 
-                timeSlots.Add(time);
+                // Skip weekends after 4 PM (optional business rule)
+                if ((date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) && time.Hour >= 16)
+                    continue;
+
+                // Check if this time slot is already booked
+                bool isBooked = existingAppointments.Any(apt => 
+                    apt.AppointmentDate.Date == time.Date && 
+                    apt.AppointmentDate.Hour == time.Hour);
+
+                if (!isBooked)
+                {
+                    timeSlots.Add(time);
+                }
             }
 
             return timeSlots;
+        }
+
+        private List<DateTime> GenerateAvailableTimeSlots(DateTime date)
+        {
+            // Synchronous wrapper for backward compatibility
+            return GenerateAvailableTimeSlotsAsync(date).GetAwaiter().GetResult();
+        }
+
+        private async Task<List<AppointmentResponse>> GetExistingAppointmentsForDateAsync(DateTime date, int? vehicleId = null)
+        {
+            try
+            {
+                var filter = new AppointmentFilterRequest
+                {
+                    StartDate = date.Date,
+                    EndDate = date.Date.AddDays(1).AddSeconds(-1), // End of the day
+                    VehicleId = vehicleId, // Filter by vehicle if provided
+                    PageIndex = 0,
+                    PageSize = 100 // Get all appointments for the day
+                };
+
+                var result = await _appointmentServices.GetAllAppointmentsAsync(filter);
+                
+                if (result.Success && result.Data != null)
+                {
+                    // Only return appointments that would block the time slot
+                    // Exclude cancelled, completed, and expired appointments
+                    return result.Data.Items
+                        .Where(apt => apt.Status == "PENDING" || 
+                                     apt.Status == "APPROVE" || 
+                                     apt.Status == "RUNNING")
+                        .ToList();
+                }
+                
+                return new List<AppointmentResponse>();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging (in production, use proper logging)
+                System.Diagnostics.Debug.WriteLine($"Error getting existing appointments: {ex.Message}");
+                
+                // If there's an error getting appointments, return empty list (fail safe)
+                return new List<AppointmentResponse>();
+            }
         }
     }
 }
