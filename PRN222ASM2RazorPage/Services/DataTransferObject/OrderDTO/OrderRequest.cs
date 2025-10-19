@@ -19,7 +19,9 @@ namespace Services.DataTransferObject.OrderDTO
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
         public decimal Amount { get; set; }
 
-        public int? DealerId { get; set; }
+        [Required(ErrorMessage = "Dealer ID is required")]
+        public int DealerId { get; set; }
+        
         public string? Notes { get; set; }
     }
 

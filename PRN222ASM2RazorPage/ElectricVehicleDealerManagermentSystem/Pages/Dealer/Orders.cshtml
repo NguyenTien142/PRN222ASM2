@@ -1,0 +1,344 @@
+@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Dealer.OrdersModel
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-paid {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-approve {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #a6d5fa;
+        }
+        
+        .status-delivering {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-done {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+        
+        .order-item {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: white;
+        }
+        
+        .order-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .vehicle-image {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .btn-status-update {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 15px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .order-id {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .customer-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+        
+        .price-highlight {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .summary-cards {
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            border-radius: 10px;
+            border: none;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .debug-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-shopping-cart text-success me-2"></i>
+                Manage Orders
+            </h2>
+            <p class="text-muted mb-0">Track and manage customer orders</p>
+        </div>
+        <a asp-page="/Dealer/Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Error Messages with detailed information -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Debug Information - Hidden in production -->
+    @if (false && !string.IsNullOrEmpty(Model.DebugMessage))
+    {
+        <div class="debug-info">
+            <h6><i class="fas fa-info-circle me-2"></i>Debug Information</h6>
+            <p class="mb-0">@Model.DebugMessage</p>
+        </div>
+    }
+
+    <!-- Orders Summary -->
+    <div class="row summary-cards">
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #ffc107, #ff8f00);">
+                <h4>@Model.Orders.Count(o => o.Status == "PENDING")</h4>
+                <p class="mb-0">Pending Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                <h4>@Model.Orders.Count(o => o.Status == "PAID")</h4>
+                <p class="mb-0">Paid Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #17a2b8, #138496);">
+                <h4>@Model.Orders.Count(o => o.Status == "DONE")</h4>
+                <p class="mb-0">Completed Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card" style="background: linear-gradient(45deg, #007bff, #0056b3);">
+                <h4>@Model.Orders.Count</h4>
+                <p class="mb-0">Total Orders</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders List -->
+    @if (Model.Orders.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                @foreach (var order in Model.Orders)
+                {
+                    <div class="order-item p-3">
+                        <div class="row align-items-center">
+                            <!-- Order ID and Status -->
+                            <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                                <div class="d-flex flex-column">
+                                    <span class="order-id">Order #@order.Id.ToString().PadLeft(6, '0')</span>
+                                    <span class="status-badge status-@order.Status.ToLower() mt-1">
+                                        @order.Status
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Customer Info -->
+                            <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                                <div class="customer-info">
+                                    <div class="customer-avatar">
+                                        @(order.Customer?.Name?.Substring(0, 1).ToUpper() ?? "?")
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">@(order.Customer?.Name ?? "Unknown Customer")</div>
+                                        <small class="text-muted">@(order.Customer?.Phone ?? "No Phone")</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vehicle Info -->
+                            <div class="col-md-3 col-sm-6 mb-2 mb-md-0">
+                                @if (order.OrderVehicles?.Any() == true)
+                                {
+                                    var vehicle = order.OrderVehicles.First().Vehicle;
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(string.IsNullOrEmpty(vehicle?.Image) ? "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=200" : vehicle.Image)"
+                                             alt="@(vehicle?.Model ?? "Vehicle")"
+                                             class="vehicle-image me-2" />
+                                        <div>
+                                            <div class="fw-bold">@(vehicle?.Model ?? "Unknown Vehicle")</div>
+                                            <small class="text-muted">@(vehicle?.Color ?? "Unknown") • @(vehicle?.CategoryName ?? "Unknown")</small>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No vehicle information</div>
+                                }
+                            </div>
+
+                            <!-- Order Details -->
+                            <div class="col-md-2 col-sm-6 mb-2 mb-md-0 text-center">
+                                <div class="price-highlight">@order.TotalAmount.ToString("C")</div>
+                                <small class="text-muted d-block">@order.OrderDate.ToString("MMM dd, yyyy")</small>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="col-md-3 col-12 text-md-end">
+                                @if (order.Status == "PENDING")
+                                {
+                                    <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+                                        <input type="hidden" name="OrderId" value="@order.Id" />
+                                        <input type="hidden" name="NewStatus" value="PAID" />
+                                        <button type="submit" 
+                                                class="btn btn-success btn-status-update"
+                                                onclick="return confirm('Mark this order as PAID?')">
+                                            <i class="fas fa-credit-card me-1"></i> Mark as Paid
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+                                        <input type="hidden" name="OrderId" value="@order.Id" />
+                                        <input type="hidden" name="NewStatus" value="CANCELLED" />
+                                        <button type="submit" 
+                                                class="btn btn-outline-danger btn-status-update"
+                                                onclick="return confirm('Cancel this order?')">
+                                            <i class="fas fa-times me-1"></i> Cancel
+                                        </button>
+                                    </form>
+                                }
+                                else if (order.Status == "PAID")
+                                {
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i> 
+                                        Payment Completed
+                                    </span>
+                                }
+                                else if (order.Status == "DELIVERING")
+                                {
+                                    <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+                                        <input type="hidden" name="OrderId" value="@order.Id" />
+                                        <input type="hidden" name="NewStatus" value="DONE" />
+                                        <button type="submit" 
+                                                class="btn btn-info btn-status-update"
+                                                onclick="return confirm('Mark this order as COMPLETED?')">
+                                            <i class="fas fa-check me-1"></i> Complete
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        <i class="fas fa-check-circle me-1"></i> 
+                                        @(order.Status == "DONE" ? "Completed" : order.Status)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Orders Found</h4>
+            <p class="text-muted">There are currently no orders in the system.</p>
+            @if (!string.IsNullOrEmpty(Model.DebugMessage))
+            {
+                <p class="text-info">Debug: @Model.DebugMessage</p>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    </script>
+}

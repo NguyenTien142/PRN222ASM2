@@ -86,7 +86,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 {
                     TempData["ErrorMessage"] = "Customer information not found. Please login again.";
                     return RedirectToPage("/Credential/Login");
-
                 }
 
                 // Get vehicle to retrieve price
@@ -97,13 +96,28 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                     return RedirectToPage(new { id = vehicleId });
                 }
 
+                // For customer purchases, we need to determine which dealer to use
+                // Option 1: Use a default dealer ID (e.g., the first dealer)
+                // Option 2: Find a dealer that has this vehicle in stock
+                // Option 3: Let customer choose dealer (would require UI changes)
+                
+                // Let's use Option 2: Find a dealer that has this vehicle in stock
+                int dealerId = 1; // Default fallback
+                
+                // You could implement logic here to find the appropriate dealer
+                // For now, we'll use the default dealer ID
+                // In a real scenario, you might want to:
+                // - Check Vehicle_Dealer table to find dealers with this vehicle
+                // - Use the dealer closest to customer
+                // - Let customer select dealer
+                
                 // Create order
-                var result = await orderServices.CreateOrder(customerId.Value, vehicleId, vehicleResult.Data.Price);
+                var result = await orderServices.CreateOrder(customerId.Value, vehicleId, vehicleResult.Data.Price, 1); // Using dealer ID = 1 as default
                 
                 if (result.Success)
                 {
                     SuccessMessage = "Order created successfully!";
-                    await LoadVehicleDetailAsync(vehicleId); // ? Reload vehicle data
+                    await LoadVehicleDetailAsync(vehicleId); // Reload vehicle data
                     return Page();
                 }
                 else
@@ -143,8 +157,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 // In production, log the exception properly
                 // Logger.LogError(ex, "Error loading vehicle details for ID: {VehicleId}", id);
             }
-        }
-
-       
+        }       
     }
 }
