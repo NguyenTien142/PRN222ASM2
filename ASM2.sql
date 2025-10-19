@@ -93,6 +93,7 @@ CREATE TABLE Appointment (
     CONSTRAINT CK_Appointment_Status CHECK (Status IN (
         'PENDING',
         'APPROVE',
+		'CANCELLED',
         'RUNNING',
         'COMPLETED',
         'EXPIRED'
