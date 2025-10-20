@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
 {
@@ -19,12 +21,14 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
         private readonly IVehicleServices vehicleServices;
         private readonly IUserServices userService;
         private readonly IOrderServices orderServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public VehicleDetailModel(IVehicleServices _vehicleServices, IUserServices _userService, IOrderServices _orderServices)
+        public VehicleDetailModel(IVehicleServices _vehicleServices, IUserServices _userService, IOrderServices _orderServices, IHubContext<SignalRHub> hubContext)
         {
            vehicleServices = _vehicleServices;
            userService = _userService;
            orderServices = _orderServices;
+           _hubContext = hubContext;
         }
 
         // Properties to bind to the view
@@ -116,6 +120,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 
                 if (result.Success)
                 {
+                    // Send real-time notification to refresh order pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     SuccessMessage = "Order created successfully!";
                     await LoadVehicleDetailAsync(vehicleId); // Reload vehicle data
                     return Page();
