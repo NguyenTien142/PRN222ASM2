@@ -289,12 +289,17 @@
                                 }
                                 else if (order.Status == "PAID")
                                 {
-                                    <span class="text-success">
-                                        <i class="fas fa-check-circle me-1"></i> 
-                                        Payment Completed
-                                    </span>
+                                    <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+                                        <input type="hidden" name="OrderId" value="@order.Id" />
+                                        <input type="hidden" name="NewStatus" value="DELIVERING" />
+                                        <button type="submit"
+                                                class="btn btn-warning btn-status-update"
+                                                onclick="return confirm('Mark this order as DELIVERING?')">
+                                            <i class="fas fa-truck me-1"></i> Start Delivery
+                                        </button>
+                                    </form>
                                 }
-                                else if (order.Status == "DELIVERING")
+                                @* else if (order.Status == "DELIVERING")
                                 {
                                     <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
                                         <input type="hidden" name="OrderId" value="@order.Id" />
@@ -305,7 +310,7 @@
                                             <i class="fas fa-check me-1"></i> Complete
                                         </button>
                                     </form>
-                                }
+                                } *@
                                 else
                                 {
                                     <span class="text-muted">

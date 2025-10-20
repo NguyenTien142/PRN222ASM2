@@ -4,17 +4,21 @@ using ElectricVehicleDealerManagermentSystem.Helpper;
 using Services.Interfaces;
 using Services.DataTransferObject.AppointmentDTO;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 {
     public class manageModel : BasePageModel
     {
         private readonly IAppointmentServices _appointmentServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public manageModel(IUserServices userServices, IAppointmentServices appointmentServices)
+        public manageModel(IUserServices userServices, IAppointmentServices appointmentServices, IHubContext<SignalRHub> hubContext)
             : base(userServices)
         {
             _appointmentServices = appointmentServices;
+            _hubContext = hubContext;
         }
 
         // Properties for appointment data
@@ -95,6 +99,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 
                 if (result.Success)
                 {
+                    // Send real-time notification to refresh all appointment pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     TempData["SuccessMessage"] = result.Message;
                 }
                 else
@@ -118,6 +125,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 
                 if (result.Success)
                 {
+                    // Send real-time notification to refresh all appointment pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     TempData["SuccessMessage"] = result.Message;
                 }
                 else
@@ -141,6 +151,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 
                 if (result.Success)
                 {
+                    // Send real-time notification to refresh all appointment pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     TempData["SuccessMessage"] = result.Message;
                 }
                 else

@@ -73,6 +73,13 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Dealer
                 return Page();
             }
 
+            // Validate status transitions
+            if (NewStatus.ToUpper() == "DELIVERING" && orderToUpdate.Status != "PAID")
+            {
+                ErrorMessage = "Only PAID orders can be changed to DELIVERING status.";
+                return Page();
+            }
+
             // Use different method based on status
             ServiceResponse result;
             if (NewStatus.ToUpper() == "PAID")
