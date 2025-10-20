@@ -119,9 +119,10 @@ namespace Repositories.CustomRepositories
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                throw new Exception($"Error updating order status: {ex.Message}", ex);
+                //return false;
             }
         }
 

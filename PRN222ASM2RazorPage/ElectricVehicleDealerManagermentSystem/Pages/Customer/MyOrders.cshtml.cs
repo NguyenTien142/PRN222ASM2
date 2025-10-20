@@ -83,10 +83,10 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Customer
                     return Page();
                 }
 
-                // Check if status is PAID
-                if (orderToUpdate.Status != "PAID")
+                // Check if status is DELIVERING (changed from PAID)
+                if (orderToUpdate.Status != "DELIVERING")
                 {
-                    ErrorMessage = $"Only paid orders can be marked as done. Current status: {orderToUpdate.Status}";
+                    ErrorMessage = $"Only orders that are being delivered can be marked as done. Current status: {orderToUpdate.Status}";
                     await LoadMyOrders();
                     return Page();
                 }
@@ -96,7 +96,7 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Customer
                 
                 if (result.Success)
                 {
-                    SuccessMessage = "Order marked as completed successfully!";
+                    SuccessMessage = "Order marked as completed successfully! Thank you for confirming receipt.";
                 }
                 else
                 {

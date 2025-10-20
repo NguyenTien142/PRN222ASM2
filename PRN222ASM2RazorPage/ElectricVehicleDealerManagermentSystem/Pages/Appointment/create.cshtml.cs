@@ -5,6 +5,8 @@ using Services.Interfaces;
 using Services.DataTransferObject.AppointmentDTO;
 using Services.DataTransferObject.VehicleDTO;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 {
@@ -12,12 +14,14 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
     {
         private readonly IAppointmentServices _appointmentServices;
         private readonly IVehicleServices _vehicleServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public createModel(IUserServices userServices, IAppointmentServices appointmentServices, IVehicleServices vehicleServices)
+        public createModel(IUserServices userServices, IAppointmentServices appointmentServices, IVehicleServices vehicleServices, IHubContext<SignalRHub> hubContext)
             : base(userServices)
         {
             _appointmentServices = appointmentServices;
             _vehicleServices = vehicleServices;
+            _hubContext = hubContext;
         }
 
         // Properties for user info
@@ -42,8 +46,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
         // Properties for messages
         public string SuccessMessage { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
+        public bool IsVehiclePreSelected { get; set; } = false;
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int? vehicleId = null)
         {
             // Check if user is logged in
             UserId = HttpContext.Session.GetInt32("UserId");
@@ -72,6 +77,13 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 
             // Initialize new appointment with customer ID
             NewAppointment.CustomerId = CustomerId.Value;
+
+            // Pre-select vehicle if provided in query string
+            if (vehicleId.HasValue && vehicleId.Value > 0)
+            {
+                NewAppointment.VehicleId = vehicleId.Value;
+                IsVehiclePreSelected = true;
+            }
 
             await LoadDataAsync();
 
@@ -105,6 +117,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
                 
                 if (result.Success)
                 {
+                    // Send real-time notification to manage appointment page
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     TempData["SuccessMessage"] = result.Message;
                     return RedirectToPage("/Appointment/Index");
                 }
@@ -197,11 +212,12 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
                     var vehicleItems = AvailableVehicles.Select(v => new SelectListItem
                     {
                         Value = v.Id.ToString(),
-                        Text = $"{v.Model} - {v.Color} ({v.CategoryName}) - ${v.Price:N0}"
+                        Text = $"{v.Model} - {v.Color} ({v.CategoryName}) - ${v.Price:N0}",
+                        Selected = v.Id == NewAppointment.VehicleId // Pre-select if this is the vehicle from query string
                     }).ToList();
 
                     vehicleItems.Insert(0, new SelectListItem { Value = "", Text = "-- Select Vehicle --" });
-                    VehicleSelectList = new SelectList(vehicleItems, "Value", "Text");
+                    VehicleSelectList = new SelectList(vehicleItems, "Value", "Text", NewAppointment.VehicleId > 0 ? NewAppointment.VehicleId.ToString() : "");
                 }
                 else
                 {

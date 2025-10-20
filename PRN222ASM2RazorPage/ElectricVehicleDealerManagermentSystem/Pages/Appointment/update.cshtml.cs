@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ElectricVehicleDealerManagermentSystem.Helpper;
 using Services.Interfaces;
 using Services.DataTransferObject.AppointmentDTO;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
 {
     public class updateModel : BasePageModel
     {
         private readonly IAppointmentServices _appointmentServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public updateModel(IUserServices userServices, IAppointmentServices appointmentServices)
+        public updateModel(IUserServices userServices, IAppointmentServices appointmentServices, IHubContext<SignalRHub> hubContext)
             : base(userServices)
         {
             _appointmentServices = appointmentServices;
+            _hubContext = hubContext;
         }
 
         // Properties for user info
@@ -131,6 +135,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
                 
                 if (result.Success)
                 {
+                    // Send real-time notification to manage appointment page
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     TempData["SuccessMessage"] = result.Message;
                     return RedirectToPage("/Appointment/Index");
                 }

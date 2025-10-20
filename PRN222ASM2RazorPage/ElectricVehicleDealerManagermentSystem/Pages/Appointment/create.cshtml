@@ -25,6 +25,14 @@
     {
         <div class="alert alert-success">@Model.SuccessMessage</div>
     }
+    @if (Model.IsVehiclePreSelected)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Vehicle Pre-selected!</strong> The vehicle you were viewing has been automatically selected for your appointment.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
@@ -135,6 +143,11 @@
             }
 
             initCalendar();
+
+            // Load slots immediately if vehicle is pre-selected (from vehicle detail page)
+            if (vehicleSelect.value) {
+                loadAvailableSlots(vehicleSelect.value);
+            }
 
             vehicleSelect.addEventListener('change', function () {
                 loadAvailableSlots(this.value);
