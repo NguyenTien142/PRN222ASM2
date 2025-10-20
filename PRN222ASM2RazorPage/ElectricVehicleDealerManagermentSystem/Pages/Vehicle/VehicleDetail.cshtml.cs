@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
 {
@@ -19,12 +21,14 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
         private readonly IVehicleServices vehicleServices;
         private readonly IUserServices userService;
         private readonly IOrderServices orderServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public VehicleDetailModel(IVehicleServices _vehicleServices, IUserServices _userService, IOrderServices _orderServices)
+        public VehicleDetailModel(IVehicleServices _vehicleServices, IUserServices _userService, IOrderServices _orderServices, IHubContext<SignalRHub> hubContext)
         {
            vehicleServices = _vehicleServices;
            userService = _userService;
            orderServices = _orderServices;
+           _hubContext = hubContext;
         }
 
         // Properties to bind to the view
@@ -86,7 +90,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 {
                     TempData["ErrorMessage"] = "Customer information not found. Please login again.";
                     return RedirectToPage("/Credential/Login");
-
                 }
 
                 // Get vehicle to retrieve price
@@ -97,13 +100,31 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                     return RedirectToPage(new { id = vehicleId });
                 }
 
+                // For customer purchases, we need to determine which dealer to use
+                // Option 1: Use a default dealer ID (e.g., the first dealer)
+                // Option 2: Find a dealer that has this vehicle in stock
+                // Option 3: Let customer choose dealer (would require UI changes)
+                
+                // Let's use Option 2: Find a dealer that has this vehicle in stock
+                int dealerId = 1; // Default fallback
+                
+                // You could implement logic here to find the appropriate dealer
+                // For now, we'll use the default dealer ID
+                // In a real scenario, you might want to:
+                // - Check Vehicle_Dealer table to find dealers with this vehicle
+                // - Use the dealer closest to customer
+                // - Let customer select dealer
+                
                 // Create order
-                var result = await orderServices.CreateOrder(customerId.Value, vehicleId, vehicleResult.Data.Price);
+                var result = await orderServices.CreateOrder(customerId.Value, vehicleId, vehicleResult.Data.Price, 1); // Using dealer ID = 1 as default
                 
                 if (result.Success)
                 {
+                    // Send real-time notification to refresh order pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
                     SuccessMessage = "Order created successfully!";
-                    await LoadVehicleDetailAsync(vehicleId); // ? Reload vehicle data
+                    await LoadVehicleDetailAsync(vehicleId); // Reload vehicle data
                     return Page();
                 }
                 else
@@ -143,8 +164,6 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
                 // In production, log the exception properly
                 // Logger.LogError(ex, "Error loading vehicle details for ID: {VehicleId}", id);
             }
-        }
-
-       
+        }       
     }
 }

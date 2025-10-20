@@ -33,6 +33,20 @@
             </div>
         </div>
 
+        <!-- My Orders -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-bag text-info fa-3x mb-3"></i>
+                    <h5 class="card-title fw-semibold">My Orders</h5>
+                    <p class="card-text text-muted">Track your orders and delivery status. Mark orders as received.</p>
+                    <a asp-page="/Customer/MyOrders" class="btn btn-info text-white w-100">
+                        <i class="fas fa-shopping-bag me-1"></i> View My Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- My Appointments -->
         <div class="col-md-4">
             <div class="card shadow-sm border-0 rounded-3 h-100">
@@ -40,7 +54,7 @@
                     <i class="fas fa-calendar text-success fa-3x mb-3"></i>
                     <h5 class="card-title fw-semibold">My Appointments</h5>
                     <p class="card-text text-muted">Schedule or view your upcoming test drives and consultations.</p>
-                    <a asp-page="/Appointments/Index" class="btn btn-success w-100">
+                    <a asp-page="/Appointment/Index" class="btn btn-success w-100">
                         <i class="fas fa-calendar-check me-1"></i> Manage Appointments
                     </a>
                 </div>

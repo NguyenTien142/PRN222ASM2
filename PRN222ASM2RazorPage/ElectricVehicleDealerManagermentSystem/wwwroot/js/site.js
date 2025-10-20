@@ -6,8 +6,12 @@
     const isOnVehicleIndex = currentPath === "/vehicle/index" || currentPath === "/vehicle";
     const isOnVehicleBrowse = currentPath === "/vehicle/browse";
     const isOnInventoryIndex = currentPath === "/inventory" || currentPath === "/inventory/index";
+    const isOnAppointmentManage = currentPath === "/appointment/manage";
+    const isOnAppointmentIndex = currentPath === "/appointment" || currentPath === "/appointment/index";
+    const isOnDealerOrders = currentPath === "/dealer/orders";
+    const isOnCustomerOrders = currentPath === "/customer/myorders";
 
-    if (isOnCategoryIndex || isOnVehicleIndex || isOnVehicleBrowse || isOnInventoryIndex) {
+    if (isOnCategoryIndex || isOnVehicleIndex || isOnVehicleBrowse || isOnInventoryIndex || isOnAppointmentManage || isOnAppointmentIndex || isOnDealerOrders || isOnCustomerOrders) {
         if (typeof signalR === 'undefined' || !signalR.HubConnectionBuilder) {
             console.warn('SignalR client not loaded');
         } else {
