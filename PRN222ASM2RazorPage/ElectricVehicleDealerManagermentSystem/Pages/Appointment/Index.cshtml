@@ -1,0 +1,161 @@
+﻿@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Appointment.IndexModel
+@{
+    ViewData["Title"] = Model.UserRole == "dealer" ? "All Appointments" : "My Appointments";
+}
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-calendar-check text-primary"></i> 
+                @(Model.UserRole == "dealer" ? "All Appointments" : "My Appointments")
+            </h2>
+            <p class="text-muted">
+                @(Model.UserRole == "dealer" 
+                    ? "View and manage all customer appointments." 
+                    : "View and manage your vehicle test drive appointments.")
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a asp-page="/Vehicle/Browse" class="btn btn-outline-primary">
+                <i class="fas fa-car"></i> Browse Vehicles
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Appointments Table -->
+    @if (Model.Appointments != null && Model.Appointments.Any())
+    {
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">ID</th>
+                                @if (Model.UserRole == "dealer")
+                                {
+                                    <th scope="col">Customer</th>
+                                }
+                                <th scope="col">Vehicle</th>
+                                <th scope="col">Date & Time</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appointment in Model.Appointments)
+                            {
+                                <tr>
+                                    <td>@appointment.Id</td>
+                                    @if (Model.UserRole == "dealer")
+                                    {
+                                        <td>@appointment.CustomerName</td>
+                                    }
+                                    <td>
+                                        <a asp-page="/Vehicle/VehicleDetail" asp-route-id="@appointment.VehicleId" class="text-decoration-none">
+                                            @appointment.VehicleModel (@appointment.VehicleColor)
+                                        </a>
+                                    </td>
+                                    <td>@appointment.AppointmentDate.ToString("MMM dd, yyyy h:mm tt")</td>
+                                    <td>
+                                        @{
+                                            var statusClass = appointment.Status.ToLower() switch
+                                            {
+                                                "pending" => "bg-warning text-dark",
+                                                "confirmed" => "bg-success",
+                                                "completed" => "bg-info",
+                                                "cancelled" => "bg-danger",
+                                                _ => "bg-secondary"
+                                            };
+                                        }
+                                        <span class="badge @statusClass">@appointment.Status</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            @if (appointment.Status.ToLower() == "pending" || appointment.Status.ToLower() == "confirmed")
+                                            {
+                                                <form method="post" asp-page-handler="Cancel" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                                    <input type="hidden" name="id" value="@appointment.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-times-circle"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            }
+                                            
+                                            @if (Model.UserRole == "dealer" && appointment.Status.ToLower() == "pending")
+                                            {
+                                                <form method="post" asp-page-handler="Confirm" class="ms-2">
+                                                    <input type="hidden" name="id" value="@appointment.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-check-circle"></i> Confirm
+                                                    </button>
+                                                </form>
+                                            }
+                                            
+                                            @if (Model.UserRole == "dealer" && appointment.Status.ToLower() == "confirmed")
+                                            {
+                                                <form method="post" asp-page-handler="Complete" class="ms-2">
+                                                    <input type="hidden" name="id" value="@appointment.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-flag-checkered"></i> Complete
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-light rounded-4">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Appointments Found</h4>
+            <p class="text-muted mb-4">
+                @(Model.UserRole == "dealer" 
+                    ? "There are no appointments in the system yet." 
+                    : "You haven't scheduled any test drive appointments yet.")
+            </p>
+            <a asp-page="/Vehicle/Browse" class="btn btn-primary">
+                <i class="fas fa-car me-2"></i>Browse Vehicles
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Add any client-side scripts here
+        $(document).ready(function() {
+            // Example: Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+    </script>
+}

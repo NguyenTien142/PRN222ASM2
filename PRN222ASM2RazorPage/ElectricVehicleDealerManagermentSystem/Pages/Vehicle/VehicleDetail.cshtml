@@ -266,7 +266,8 @@
                                                 <i class="bi bi-cart-check me-2"></i>Buy
                                             </button>
                                             </form>
-                                            <button class="btn btn-outline-primary w-100 dashboard-btn-appointment">
+                                            <button type="button" class="btn btn-outline-primary w-100 dashboard-btn-appointment" 
+                                                    data-bs-toggle="modal" data-bs-target="#appointmentModal">
                                                 <i class="bi bi-calendar-check me-2"></i>Appointment
                                             </button>
                                         }
@@ -378,6 +379,40 @@
             </a>
         </div>
     }
+
+    <!-- Appointment Modal -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appointmentModalLabel">Schedule an Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" asp-page-handler="CreateAppointment">
+                    <div class="modal-body">
+                        <input type="hidden" name="vehicleId" value="@Model.Vehicle?.Id" />
+                        <div class="mb-3">
+                            <label for="appointmentDate" class="form-label">Select Date and Time</label>
+                            <input type="datetime-local"
+                                    class="form-control"
+                                    id="appointmentDate"
+                                    name="appointmentDate"
+                                    required
+                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Schedule a test drive for this @Model.Vehicle?.Model
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
@@ -397,4 +432,42 @@
 <!-- Custom JS -->
 <script src="/js/CarDetail.js"></script>
 
-
+<script>
+    // Set minimum date for appointment to tomorrow
+    document.addEventListener('DOMContentLoaded', function() {
+        const appointmentDateInput = document.getElementById('appointmentDate');
+        if (appointmentDateInput) {
+            // Set default date to tomorrow at 9:00 AM
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            
+            // Format for datetime-local input
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            const hours = String(tomorrow.getHours()).padStart(2, '0');
+            const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
+            
+            const defaultValue = `${year}-${month}-${day}T${hours}:${minutes}`;
+            appointmentDateInput.value = defaultValue;
+            
+            // Set business hours constraints (9 AM to 5 PM)
+            appointmentDateInput.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const hours = selectedDate.getHours();
+                
+                if (hours < 9 || hours >= 17) {
+                    alert('Please select a time between 9:00 AM and 5:00 PM');
+                    // Reset to 9 AM on the selected date
+                    selectedDate.setHours(9, 0, 0, 0);
+                    
+                    const year = selectedDate.getFullYear();
+                    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(selectedDate.getDate()).padStart(2, '0');
+                    this.value = `${year}-${month}-${day}T09:00`;
+                }
+            });
+        }
+    });
+</script>

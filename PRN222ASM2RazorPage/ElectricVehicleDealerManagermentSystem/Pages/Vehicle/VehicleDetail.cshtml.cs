@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Context;
 using Repositories.Model;
+using Services.DataTransferObject.AppointmentDTO;
 using Services.DataTransferObject.VehicleDTO;
 using Services.Interfaces;
 using System;
@@ -19,12 +20,19 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
         private readonly IVehicleServices vehicleServices;
         private readonly IUserServices userService;
         private readonly IOrderServices orderServices;
+        private readonly IAppointmentServices _appointmentServices;
 
-        public VehicleDetailModel(IVehicleServices _vehicleServices, IUserServices _userService, IOrderServices _orderServices)
+
+        public VehicleDetailModel(
+            IVehicleServices _vehicleServices, 
+            IUserServices _userService, 
+            IOrderServices _orderServices,
+            IAppointmentServices appointmentServices)
         {
-           vehicleServices = _vehicleServices;
-           userService = _userService;
-           orderServices = _orderServices;
+            vehicleServices = _vehicleServices;
+            userService = _userService;
+            orderServices = _orderServices;
+            _appointmentServices = appointmentServices;
         }
 
         // Properties to bind to the view
@@ -145,6 +153,66 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Vehicle
             }
         }
 
-       
+        public async Task<IActionResult> OnPostCreateAppointmentAsync(int vehicleId, DateTime appointmentDate)
+        {
+            try
+            {
+                var currentUserId = HttpContext.Session.GetInt32("UserId");
+                if (!currentUserId.HasValue)
+                {
+                    TempData["ErrorMessage"] = "Please login to schedule an appointment.";
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                var userRole = HttpContext.Session.GetString("RoleName")?.ToLower();
+                if (userRole != "customer")
+                {
+                    TempData["ErrorMessage"] = "Only customers can schedule appointments.";
+                    return RedirectToPage(new { id = vehicleId });
+                }
+
+                var customerId = HttpContext.Session.GetInt32("CustomerId");
+                if (!customerId.HasValue)
+                {
+                    TempData["ErrorMessage"] = "Customer information not found. Please login again.";
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                if (appointmentDate <= DateTime.Now)
+                {
+                    TempData["ErrorMessage"] = "Appointment date must be in the future.";
+                    return RedirectToPage(new { id = vehicleId });
+                }
+
+                var request = new CreateAppointmentRequest
+                {
+                    CustomerId = customerId.Value,
+                    VehicleId = vehicleId,
+                    AppointmentDate = appointmentDate,
+                    Status = "Pending"
+                };
+
+                var result = await _appointmentServices.CreateAppointmentAsync(request);
+                
+                if (result.Success)
+                {
+                    SuccessMessage = "Appointment scheduled successfully!";
+                    await LoadVehicleDetailAsync(vehicleId);
+                    return Page();
+                }
+                else
+                {
+                    ErrorMessage = result.Message ?? "Failed to schedule appointment.";
+                    await LoadVehicleDetailAsync(vehicleId);
+                    return Page();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "An error occurred while scheduling your appointment. Please try again.";
+                await LoadVehicleDetailAsync(vehicleId);
+                return Page();
+            }
+        }
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Services.DataTransferObject.AppointmentDTO;
+using Services.DataTransferObject.Common;
 
 namespace Services.Interfaces
 {
     public interface IAppointmentServices
     {
+        Task<ServiceResponse<AppointmentResponse>> CreateAppointmentAsync(CreateAppointmentRequest request);
+        Task<ServiceResponse<IEnumerable<AppointmentResponse>>> GetAppointmentsByCustomerAsync(int customerId);
+        Task<ServiceResponse<IEnumerable<AppointmentResponse>>> GetAllAppointmentsAsync(bool includeDeleted = false);
     }
 }

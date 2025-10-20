@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Repositories.Model;
+using Services.DataTransferObject.AppointmentDTO;
 using Services.DataTransferObject.UserDTO;
 using Services.DataTransferObject.VehicleCategoryDTO;
 using Services.DataTransferObject.VehicleDTO;
@@ -55,6 +56,17 @@ namespace Services.Helpper.Mapper
             CreateMap<CreateVehicleRequest, Vehicle>()
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
             CreateMap<UpdateVehicleRequest, Vehicle>();
+
+            // Appointment mappings
+            CreateMap<Appointment, AppointmentResponse>()
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
+                .ForMember(dest => dest.VehicleModel, opt => opt.MapFrom(src => src.Vehicle.Model))
+                .ForMember(dest => dest.VehicleVersion, opt => opt.MapFrom(src => src.Vehicle.Version))
+                .ForMember(dest => dest.VehicleColor, opt => opt.MapFrom(src => src.Vehicle.Color));
+
+            CreateMap<CreateAppointmentRequest, Appointment>();
+            CreateMap<UpdateAppointmentRequest, Appointment>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }
