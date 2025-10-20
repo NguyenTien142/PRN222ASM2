@@ -3,16 +3,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Services.DataTransferObject.OrderDTO;
 using Services.DataTransferObject.Common;
 using Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using ElectricVehicleDealerManagermentSystem.SignalR;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Dealer
 {
     public class OrdersModel : PageModel
     {
         private readonly IOrderServices _orderServices;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public OrdersModel(IOrderServices orderServices)
+        public OrdersModel(IOrderServices orderServices, IHubContext<SignalRHub> hubContext)
         {
             _orderServices = orderServices;
+            _hubContext = hubContext;
         }
 
         public List<OrderResponse> Orders { get; set; } = new List<OrderResponse>();
@@ -95,6 +99,9 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Dealer
             
             if (result.Success)
             {
+                // Send real-time notification to refresh order pages
+                await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                
                 SuccessMessage = result.Message;
             }
             else
