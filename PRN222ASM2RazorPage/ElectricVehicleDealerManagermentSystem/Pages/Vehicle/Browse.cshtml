@@ -4,117 +4,96 @@
     ViewData["Title"] = "Browse Vehicles";
 }
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-8">
-            <h2 class="mb-0">
-                <i class="fas fa-car text-primary"></i> Browse Vehicles
-            </h2>
-            <p class="text-muted">Explore all available electric vehicles by model, color, or category.</p>
-        </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a asp-page="/Index" class="btn btn-outline-secondary">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
-        </div>
-    </div>
-
-    <!-- Filter Section -->
-    <form method="get" class="card shadow-sm border-0 rounded-4 mb-4 p-3">
-        <div class="row g-3 align-items-end">
-            <!-- Category Filter -->
-            <div class="col-md-4">
-                <label for="CategoryFilter" class="form-label fw-semibold">Category</label>
-                <select asp-for="CategoryFilter" asp-items="Model.CategorySelectList" class="form-select"></select>
+<div class="bg-body-tertiary py-4 min-vh-100" style="background: #f5f8fb;">
+    <div class="container-lg">
+        <!-- Header -->
+        <div class="row align-items-center mb-4">
+            <div class="col-md-8">
+                <h2 class="mb-0 d-flex align-items-center" style="color: var(--primary);">
+                    <i class="fas fa-car text-primary fa-lg me-2"></i> Browse Vehicles
+                </h2>
+                <p class="text-muted">Explore all available electric vehicles by model, color, or category.</p>
             </div>
-
-            <!-- Search Bar -->
-            <div class="col-md-6">
-                <label for="SearchTerm" class="form-label fw-semibold">Search</label>
-                <input asp-for="SearchTerm" class="form-control" placeholder="Search by model, color, or version..." />
-            </div>
-
-            <!-- Submit Button -->
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Filter
-                </button>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a asp-page="/Index" class="btn btn-outline-secondary rounded-pill shadow-sm px-4">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
             </div>
         </div>
-    </form>
-
-    <!-- Error Message -->
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
-        </div>
-    }
-
-    <!-- Vehicle List -->
-    @if (Model.Vehicles != null && Model.Vehicles.Any())
-    {
-        <div class="row g-4">
+        <!-- Filter Section -->
+        <form method="get" class="card shadow-sm border-0 rounded-4 mb-4 p-4 bg-light">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="CategoryFilter" class="form-label fw-semibold">Category</label>
+                    <select asp-for="CategoryFilter" asp-items="Model.CategorySelectList" class="form-select rounded-pill"></select>
+                </div>
+                <div class="col-md-6">
+                    <label for="SearchTerm" class="form-label fw-semibold">Search</label>
+                    <input asp-for="SearchTerm" class="form-control rounded-pill" placeholder="Search by model, color, or version..." />
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-pill px-2">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger shadow-sm rounded-3 ps-4 py-2"> <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage </div>
+        }
+        @if (Model.Vehicles != null && Model.Vehicles.Any())
+        {
+            <div class="row g-4">
             @foreach (var vehicle in Model.Vehicles)
             {
                 <div class="col-md-4 col-lg-3">
-                    <div class="card shadow-sm h-100 border-0 rounded-4 hover-shadow">
+                    <div class="card shadow-lg border-0 rounded-4 h-100 position-relative vehicle-card animate__animated animate__fadeIn">
                         <div class="position-relative">
                             <img src="@(string.IsNullOrEmpty(vehicle.Image) ? "/images/no-image.png" : vehicle.Image)"
                                  class="card-img-top rounded-top-4"
                                  alt="Vehicle Image"
                                  style="height: 200px; object-fit: cover;">
-                            <span class="badge bg-primary position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-primary position-absolute top-0 start-0 m-2 text-uppercase rounded-pill px-3" style="font-size:1rem; letter-spacing:0.7px;">
                                 @vehicle.CategoryName
                             </span>
                         </div>
-
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">@vehicle.Model</h5>
-                            <p class="card-text mb-1"><strong>Color:</strong> @vehicle.Color</p>
+                        <div class="card-body pb-2">
+                            <h5 class="fw-bold text-primary mb-1">@vehicle.Model</h5>
+                            <div class="mb-1"><strong>Color:</strong> <span class="badge rounded-pill bg-info text-dark px-2">@vehicle.Color</span></div>
                             @if (!string.IsNullOrEmpty(vehicle.Version))
                             {
-                                <p class="card-text mb-1"><strong>Version:</strong> @vehicle.Version</p>
+                                <div class="mb-1"><strong>Version:</strong> <span class="badge rounded-pill bg-accent px-2">@vehicle.Version</span></div>
                             }
-                            <p class="card-text mb-1"><strong>Price:</strong> @vehicle.Price.ToString("C")</p>
-                            <p class="card-text mb-0 text-muted">
-                                <small>Manufactured on @vehicle.ManufactureDate.ToString("MMM dd, yyyy")</small>
-                            </p>
+                            <div class="mb-1"><strong>Price:</strong> <span class="fw-semibold" style="color: var(--success);">@vehicle.Price.ToString("C")</span></div>
+                            <div class="text-muted small"><small>Manufactured on @vehicle.ManufactureDate.ToString("MMM dd, yyyy")</small></div>
                         </div>
-
                         <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-                            <a asp-page="/Vehicle/VehicleDetail" 
-                               asp-route-id="@vehicle.Id" 
-                               asp-route-userId="@HttpContext.Session.GetInt32("UserId")" 
-                               class="btn btn-sm btn-outline-primary">
+                            <a asp-page="/Vehicle/VehicleDetail" asp-route-id="@vehicle.Id" asp-route-userId="@HttpContext.Session.GetInt32("UserId")"
+                               class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-none">
                                 <i class="fas fa-eye"></i> View
                             </a>
-
                             @if (HttpContext.Session.GetString("RoleName")?.ToLower() is "dealer" or "admin")
                             {
                                 <div class="d-flex gap-2">
-                                    <a asp-page="/Vehicle/Update" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-success">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-page="/Vehicle/Delete" asp-route-id="@vehicle.Id" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <a asp-page="/Vehicle/Update" asp-route-id="@vehicle.Id" class="btn btn-outline-success btn-sm rounded-pill"><i class="fas fa-edit"></i></a>
+                                    <a asp-page="/Vehicle/Delete" asp-route-id="@vehicle.Id" class="btn btn-outline-danger btn-sm rounded-pill"><i class="fas fa-trash"></i></a>
                                 </div>
                             }
                         </div>
                     </div>
                 </div>
             }
-        </div>
-    }
-    else
-    {
-        <div class="text-center text-muted py-5">
-            <i class="fas fa-info-circle fa-2x mb-3"></i>
-            <p class="mb-0">No vehicles found. Try adjusting your filters or search terms.</p>
-        </div>
-    }
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <p class="mb-0">No vehicles found. Try adjusting your filters or search terms.</p>
+            </div>
+        }
+    </div>
 </div>
 
 @section Scripts {
