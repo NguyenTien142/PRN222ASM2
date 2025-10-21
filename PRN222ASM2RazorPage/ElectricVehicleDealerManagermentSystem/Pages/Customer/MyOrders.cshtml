@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model ElectricVehicleDealerManagermentSystem.Pages.Customer.MyOrdersModel
 @{
     ViewData["Title"] = "My Orders";
@@ -229,7 +229,7 @@
                                             <div>
                                                 <h6 class="mb-1">@(vehicle?.Model ?? "Unknown Vehicle")</h6>
                                                 <p class="text-muted mb-0">
-                                                    <small>@(vehicle?.Color ?? "Unknown") � @(vehicle?.CategoryName ?? "Unknown")</small>
+                                                    <small>@(vehicle?.Color ?? "Unknown") • @(vehicle?.CategoryName ?? "Unknown")</small>
                                                 </p>
                                                 <p class="text-muted mb-0">
                                                     <small><strong>Unit Price:</strong> @order.OrderVehicles.First().UnitPrice.ToString("C")</small>
@@ -396,11 +396,37 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Instructions:</strong> If you completed payment on VNPay but the status didn't update automatically, use this form to verify your payment.
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label
+
+                <form method="post" asp-page-handler="VerifyPayment">
+                    <div class="mb-3">
+                        <label class="form-label" for="transactionId">Transaction ID (VNP Transaction No.)</label>
+                        <input type="text" id="transactionId" name="TransactionId" class="form-control" placeholder="Enter VNPay Transaction No." required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="orderId">Order ID</label>
+                        <input type="number" id="orderId" name="OrderId" class="form-control" placeholder="Enter your Order ID" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="amount">Amount (VNĐ)</label>
+                        <input type="number" id="amount" name="Amount" class="form-control" placeholder="Enter payment amount" required />
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-search me-2"></i>Verify Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
