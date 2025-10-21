@@ -261,27 +261,48 @@
                 <!-- Dashboard Sidebar -->
                 <div class="col-lg-4">
                     <div class="dashboard-card p-4">
+                        <!-- Vehicle Summary -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3" style="color: var(--primary);">
+                                <i class="fas fa-clipboard-list me-2" style="color: var(--accent);"></i>Order Summary
+                            </h6>
 
-                        <!-- User Info -->
-                        <div class="text-center mb-4">
-                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-user text-primary fa-2x"></i>
-                            </div>
-                            <h6 class="fw-semibold">@(Model.UserRole?.ToUpper() ?? "GUEST")</h6>
-                        </div>
-
-                        <!-- Vehicle Stats -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <div class="h4 fw-bold text-success mb-1">@Model.Vehicle.Price.ToString("C0")</div>
-                                    <small class="text-muted">Price</small>
+                            <div class="bg-light rounded-3 p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold">Vehicle:</span>
+                                    <span class="text-primary">@Model.Vehicle.Model</span>
                                 </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold">Color:</span>
+                                    <span>@Model.Vehicle.Color</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold">Year:</span>
+                                    <span>@Model.Vehicle.ManufactureDate.Year</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold">Category:</span>
+                                    <span>@Model.Vehicle.CategoryName</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.Vehicle.Version))
+                                {
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-semibold">Version:</span>
+                                        <span>@Model.Vehicle.Version</span>
+                                    </div>
+                                }
                             </div>
-                            <div class="col-6">
-                                <div class="text-center">
-                                    <div class="h4 fw-bold text-info mb-1">@Model.Vehicle.ManufactureDate.Year</div>
-                                    <small class="text-muted">Year</small>
+
+                            <!-- Pricing Breakdown -->
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold">Vehicle Price:</span>
+                                    <span class="text-success fw-bold">@Model.Vehicle.Price.ToString("C0")</span>
+                                </div>
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold fs-6">Total Amount:</span>
+                                    <span class="fw-bold text-primary fs-5">@((Model.Vehicle.Price).ToString("C0"))</span>
                                 </div>
                             </div>
                         </div>
@@ -296,8 +317,8 @@
                                         <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
                                         <button type="submit"
                                                 class="btn btn-primary action-btn w-100"
-                                                onclick="return confirm('Are you sure you want to purchase this vehicle for @Model.Vehicle.Price.ToString("C")?')">
-                                            <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                                                onclick="return confirm('Are you sure you want to purchase this vehicle for @((Model.Vehicle.Price).ToString("C0")) (including tax)?')">
+                                            <i class="fas fa-shopping-cart me-2"></i>Buy Now - @((Model.Vehicle.Price).ToString("C0"))
                                         </button>
                                     </form>
 
