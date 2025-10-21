@@ -4,7 +4,49 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-lg-8 text-center">
+            <div class="mb-4">
+                <i class="fas fa-bolt fa-4x mb-3" style="color: var(--accent);"></i>
+                <h1 class="display-4 fw-bold" style="color: var(--primary); letter-spacing: 1px;">Welcome to <span style="color:var(--accent);">EV Dealer</span>!</h1>
+            </div>
+            <p class="lead text-muted mb-4">Your trusted platform for buying, selling, and managing electric vehicles. Let’s start your sustainable drive!</p>
+            <div class="row mb-4 g-3 justify-content-center">
+                <div class="col-6 col-md-4">
+                    <div class="card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body py-4">
+                            <i class="fas fa-car fa-2x mb-2" style="color:var(--primary)"></i>
+                            <h5 class="fw-semibold mb-0">Browse Vehicles</h5>
+                            <p class="text-muted mb-2 small">See all electric models, compare features and prices.</p>
+                            <a asp-page="/Vehicle/Browse" class="btn btn-primary w-100 rounded-pill">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body py-4">
+                            <i class="fas fa-calendar-check fa-2x mb-2" style="color:var(--success)"></i>
+                            <h5 class="fw-semibold mb-0">Book Test Drive</h5>
+                            <p class="text-muted mb-2 small">Schedule your appointment for a real EV experience.</p>
+                            <a asp-page="/Appointment/Index" class="btn btn-success w-100 rounded-pill">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 d-none d-md-block">
+                    <div class="card shadow-sm border-0 rounded-4 h-100">
+                        <div class="card-body py-4">
+                            <i class="fas fa-user-circle fa-2x mb-2" style="color:var(--info)"></i>
+                            <h5 class="fw-semibold mb-0">Manage Profile</h5>
+                            <p class="text-muted mb-2 small">Login or sign up for managing your purchases and history.</p>
+                            <a asp-page="/Credential/Login" class="btn btn-info w-100 text-white rounded-pill">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 py-3">
+                <span class="badge bg-accent text-dark px-4 py-2 fs-5 rounded-pill">Electric Vehicle Dealer Management System</span>
+            </div>
+        </div>
+    </div>
 </div>

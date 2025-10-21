@@ -1,5 +1,20 @@
+:root {
+  --primary: #2E86C1;
+  --secondary: #1C2833;
+  --accent: #F1C40F;
+  --background: #F8F9F9;
+  --success: #27AE60;
+  --error: #CB4335;
+  --info: #5DADE2;
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --white: #fff;
+}
+
 html {
   font-size: 14px;
+  background: var(--background);
+  color: var(--text-main);
 }
 
 @media (min-width: 768px) {
@@ -8,15 +23,140 @@ html {
   }
 }
 
+body {
+  margin-bottom: 60px;
+  background: var(--background);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: var(--text-main);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.navbar {
+  background: var(--white) !important;
+  border-bottom: 2px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+}
+.nav-link {
+  transition: color 0.2s;
+}
+.nav-link:hover {
+  color: var(--primary) !important;
+}
+.navbar-brand {
+  color: var(--primary) !important;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.btn-primary,
+.btn-primary:focus {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(46, 134, 193, 0.12);
+}
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: #216a9b;
+  border-color: #216a9b;
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--secondary);
+  border: none;
+}
+.btn-accent:hover {
+  background-color: #ffe066;
+  color: var(--primary);
+}
+
+footer {
+  background: var(--secondary);
+  color: var(--white) !important;
+  letter-spacing: 0.8px;
+  font-size: 1rem;
+  border-top: 3px solid var(--accent);
+}
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(46, 134, 193, 0.08);
+  border: none;
+  margin-bottom: 2rem;
+  background: var(--white);
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 8px 40px rgba(46, 134, 193, 0.14);
+}
+
+.form-control, .form-select {
+  border-radius: 0.6rem;
+  border-color: var(--primary);
+  box-shadow: none;
+  transition: border-color 0.2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.15rem var(--accent);
+}
+
+.table {
+  background: var(--white);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.05);
+}
+.table thead {
+  background: var(--primary);
+  color: var(--white);
+}
+.table tbody tr:hover {
+  background: #e8f6fd;
+}
+
+.badge-success { background: var(--success); }
+.badge-error   { background: var(--error); }
+.badge-info    { background: var(--info); }
+
+.shadow-sm {
+  box-shadow: 0 2px 6px 0 rgba(44, 62, 80, .09) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 8px;
+}
+::-webkit-scrollbar {
+  background: var(--background);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color .18s;
+}
+a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Đảm bảo responsive cho bảng, form */
+.table-responsive {
+  overflow-x: auto;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primary);
 }
 
 html {
   position: relative;
   min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
 }
