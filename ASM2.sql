@@ -162,18 +162,18 @@ INSERT INTO Customer (UserId, Name, Phone, Address) VALUES
 
 -- 5️⃣ Vehicles
 INSERT INTO Vehicle (CategoryId, Color, Price, ManufactureDate, Model, Version, Image, IsDeleted) VALUES
-(1, N'Red', 55000, '2023-05-12', N'Toyota Camry', N'2.5Q', N'/images/camry.jpg', 0),
-(2, N'Black', 72000, '2024-01-25', N'Hyundai Tucson', N'2024 Edition', N'/images/tucson.jpg', 0),
-(3, N'White', 68000, '2023-07-15', N'Ford Ranger', N'Wildtrak', N'/images/ranger.jpg', 0),
-(4, N'Blue', 120000, '2024-03-01', N'BMW Z4', N'M40i', N'/images/z4.jpg', 0),
-(1, N'Silver', 43000, '2022-11-18', N'Honda Civic', N'RS Turbo', N'/images/civic.jpg', 0);
+(1, N'Red', 55000, '2023-05-12', N'Toyota Camry', N'2.5Q', N'/uploads/vehicles/01242521-60f3-436d-83b6-f6eea4a9bc1c.jpg', 0),
+(2, N'Black', 72000, '2024-01-25', N'Hyundai Tucson', N'2024 Edition', N'/uploads/vehicles/503b5b8d-5c8b-4b41-a126-c72483215994.jpg', 0),
+(3, N'White', 68000, '2023-07-15', N'Ford Ranger', N'Wildtrak', N'/uploads/vehicles/2b9f4973-846b-4d54-8482-c746858ba7f9.jpg', 0),
+(4, N'Blue', 120000, '2024-03-01', N'BMW Z4', N'M40i', N'/uploads/vehicles/13ec6a3c-b940-4631-8b22-6d29320376b4.jpg', 0),
+(1, N'Silver', 43000, '2022-11-18', N'Honda Civic', N'RS Turbo', N'/uploads/vehicles/d36bd81a-1089-4fe0-9c56-a103323f08d9.jpg', 0);
 
 -- 6️⃣ Vehicle_Dealer (inventory by dealer)
 INSERT INTO Vehicle_Dealer (VehicleId, DealerId, Quantity) VALUES
 (1, 1, 5),
 (2, 1, 3),
-(3, 2, 4),
-(4, 2, 2),
+(3, 1, 4),
+(4, 1, 2),
 (5, 1, 6);
 
 -- 7️⃣ Appointments (customers viewing/test-driving vehicles)
