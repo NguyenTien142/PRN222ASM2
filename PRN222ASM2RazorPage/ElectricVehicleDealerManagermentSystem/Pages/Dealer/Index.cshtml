@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model ElectricVehicleDealerManagermentSystem.Pages.Dealer.IndexModel
 @{
     ViewData["Title"] = "Dealer Dashboard";
@@ -9,68 +9,100 @@
     <!-- Welcome Header -->
     <div class="row">
         <div class="col-12">
-            <div class="card bg-success text-white mb-4 shadow rounded-4 border-0">
-                <div class="card-body">
-                    <h2 class="card-title mb-3"><i class="fas fa-store me-2" style="color: var(--accent);"></i>
-                        Welcome, @Model.DealerName!
-                    </h2>
-                    <p class="card-text">Logged in as <strong>@Model.Username</strong></p>
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden mb-4" style="background: linear-gradient(135deg, var(--primary), var(--accent));">
+                <div class="card-body text-white p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="card-title mb-2">
+                                <i class="fas fa-store me-3" style="font-size: 1.8rem;"></i>
+                                Welcome back, @Model.DealerName!
+                            </h2>
+                            @* <p class="card-text mb-0 opacity-75">
+                                <i class="fas fa-user me-2"></i>Logged in as <strong>@Model.Username</strong>
+                            </p> *@
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="badge bg-white bg-opacity-25 fs-6 px-3 py-2 rounded-pill">
+                                <i class="fas fa-calendar-day me-2"></i>@DateTime.Now.ToString("dddd, MMMM dd")
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Dealer Quick Actions -->
-    <div class="row text-center">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow border-0 rounded-4">
-                <div class="card-body">
-                    <i class="fas fa-car fa-3x mb-3" style="color: var(--primary);"></i>
-                    <h5 class="card-title fw-semibold">Manage Inventory</h5>
-                    <p class="text-muted">Add, edit, or remove electric vehicles in your dealership.</p>
-                    <a href="/inventory" class="btn btn-primary rounded-pill px-4">
-                        Go to Inventory
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow border-0 rounded-4">
-                <div class="card-body">
-                    <i class="fas fa-shopping-cart fa-3x mb-3" style="color: var(--success);"></i>
-                    <h5 class="card-title fw-semibold">View Orders</h5>
-                    <p class="text-muted">Track customer orders and sales activity.</p>
-                    <a asp-page="/Dealer/Orders" class="btn btn-success rounded-pill px-4">
-                        View Orders
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card shadow border-0 rounded-4">
-                <div class="card-body">
-                    <i class="fas fa-calendar-check fa-3x mb-3" style="color: var(--primary);"></i>
-                    <h5 class="card-title fw-semibold">Manage Appointments</h5>
-                    <p class="text-muted">View, approve, and manage customer appointments in real time.</p>
-                    <a asp-page="/Appointment/Manage" class="btn btn-primary rounded-pill px-4">
-                        Go to Manage Appointments
-                    </a>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4 fw-bold" style="color: var(--primary);">
+                        <i class="fas fa-bolt me-2" style="color: var(--accent);"></i>Quick Actions
+                    </h5>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light hover-lift h-100 rounded-3">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-wrapper mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--accent));">
+                                        <i class="fas fa-car text-white fa-2x"></i>
+                                    </div>
+                                    <h6 class="fw-semibold mb-2">Manage Inventory</h6>
+                                    <p class="text-muted small mb-3">Add, edit, or remove electric vehicles in your dealership.</p>
+                                    <a href="/Vehicle/Index" class="btn btn-primary rounded-pill px-4 w-100">
+                                        <i class="fas fa-arrow-right me-2"></i>Go to Inventory
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light hover-lift h-100 rounded-3">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-wrapper mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--success), #28a745);">
+                                        <i class="fas fa-shopping-cart text-white fa-2x"></i>
+                                    </div>
+                                    <h6 class="fw-semibold mb-2">View Orders</h6>
+                                    <p class="text-muted small mb-3">Track customer orders and sales activity.</p>
+                                    <a asp-page="/Dealer/Orders" class="btn btn-success rounded-pill px-4 w-100">
+                                        <i class="fas fa-arrow-right me-2"></i>View Orders
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light hover-lift h-100 rounded-3">
+                                <div class="card-body text-center p-4">
+                                    <div class="icon-wrapper mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--info), #17a2b8);">
+                                        <i class="fas fa-calendar-check text-white fa-2x"></i>
+                                    </div>
+                                    <h6 class="fw-semibold mb-2">Manage Appointments</h6>
+                                    <p class="text-muted small mb-3">View, approve, manage customer appointments.</p>
+                                    <a asp-page="/Appointment/Manage" class="btn btn-info rounded-pill px-4 w-100">
+                                        <i class="fas fa-arrow-right me-2"></i>Manage Appointments
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Dealer Info -->
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-header bg-light fw-bold rounded-top-4" style="color: var(--primary);">
-                    Dealer Information
-                </div>
-                <div class="card-body">
-                    <p><strong>Dealer ID:</strong> @Model.DealerId</p>
-                    <p><strong>Dealer Name:</strong> @Model.DealerName</p>
-                    <p><strong>Username:</strong> @Model.Username</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+    
+
+<style>
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+.stat-icon {
+    transition: transform 0.2s ease;
+}
+.stat-icon:hover {
+    transform: scale(1.1);
+}
+</style>
