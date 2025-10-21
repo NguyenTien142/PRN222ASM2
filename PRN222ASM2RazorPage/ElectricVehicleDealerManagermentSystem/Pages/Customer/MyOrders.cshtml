@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model ElectricVehicleDealerManagermentSystem.Pages.Customer.MyOrdersModel
 @{
     ViewData["Title"] = "My Orders";
@@ -51,10 +51,10 @@
             overflow: hidden;
         }
 
-            .order-item:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
+        .order-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
         .vehicle-image {
             width: 80px;
@@ -102,11 +102,11 @@
             transition: all 0.3s ease;
         }
 
-            .btn-mark-done:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-                color: white;
-            }
+        .btn-mark-done:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
 
         .summary-cards {
             margin-bottom: 2rem;
@@ -121,25 +121,17 @@
             margin-bottom: 1rem;
         }
 
-        .debug-info {
-            background-color: #f8f9fa;
-            border-left: 4px solid #17a2b8;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0 4px 4px 0;
-        }
-
         .empty-state {
             text-align: center;
             padding: 3rem;
             color: #6c757d;
         }
 
-            .empty-state i {
-                font-size: 4rem;
-                margin-bottom: 1rem;
-                opacity: 0.5;
-            }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
     </style>
 }
 
@@ -185,18 +177,93 @@
                                 <small class="text-muted d-block">@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</small>
                             </div>
                         </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-6 mb-2 mb-md-0">
-                                @if (order.OrderVehicles?.Any() == true) {
-                                    var vehicle = order.OrderVehicles.First().Vehicle;
-                                    <div class="d-flex align-items-center">
-                                        <img src="@(string.IsNullOrEmpty(vehicle?.Image) ? "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=200" : vehicle.Image)" alt="@(vehicle?.Model ?? "Vehicle")" class="vehicle-image me-3 shadow-sm bg-white p-1" />
-                                        <div>
-                                            <h6 class="mb-1 fw-bold" style="color: var(--primary)">@(vehicle?.Model ?? "Unknown Vehicle")</h6>
-                                            <p class="text-muted mb-0"><small>@(vehicle?.Color ?? "Unknown") ・ @(vehicle?.CategoryName ?? "Unknown")</small></p>
-                                            <p class="text-muted mb-0"><small><strong>Unit Price:</strong> @order.OrderVehicles.First().UnitPrice.ToString("C")</small></p>
+                        <div class="p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    @if (order.OrderVehicles?.Any() == true)
+                                    {
+                                        var vehicle = order.OrderVehicles.First().Vehicle;
+                                        <div class="d-flex align-items-center">
+                                            <img src="@(string.IsNullOrEmpty(vehicle?.Image) ? "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=200" : vehicle.Image)"
+                                                 alt="@(vehicle?.Model ?? "Vehicle")"
+                                                 class="vehicle-image me-3" />
+                                            <div>
+                                                <h6 class="mb-1">@(vehicle?.Model ?? "Unknown Vehicle")</h6>
+                                                <p class="text-muted mb-0">
+                                                    <small>@(vehicle?.Color ?? "Unknown") • @(vehicle?.CategoryName ?? "Unknown")</small>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    <small><strong>Unit Price:</strong> @order.OrderVehicles.First().UnitPrice.ToString("C")</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">No vehicle information available</div>
+                                    }
+                                </div>
+
+                                <div class="col-md-6 text-md-end">
+                                    @if (order.Status == "PENDING")
+                                    {
+                                        <div class="mb-2">
+                                            <span class="text-warning">
+                                                <i class="fas fa-clock me-2"></i>Waiting for payment...
+                                            </span>
+                                        </div>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <form method="post" asp-page-handler="Pay" class="d-inline">
+                                                <input type="hidden" name="orderId" value="@order.Id" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn btn-primary"
+                                                        style="background: linear-gradient(45deg, #007bff, #0056b3); border: none; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 600;">
+                                                    <i class="fas fa-credit-card me-1"></i> Pay Now
+                                                </button>
+                                            </form>
+                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="showVerifyModal(@order.Id)">
+                                                <i class="fas fa-check-circle me-1"></i> Verify Payment
+                                            </button>
+                                        </div>
+                                    }
+                                    else if (order.Status == "PAID")
+                                    {
+                                        <div class="text-info">
+                                            <i class="fas fa-credit-card me-2"></i> Payment received. Waiting for dealer to deliver.
+                                        </div>
+                                    }
+                                    else if (order.Status == "DELIVERING")
+                                    {
+                                        <div class="mb-2">
+                                            <span class="delivery-status">
+                                                <i class="fas fa-truck me-2"></i>Being Delivered
+                                            </span>
+                                        </div>
+                                        <form method="post" asp-page-handler="MarkAsDone" class="d-inline">
+                                            <input type="hidden" name="OrderId" value="@order.Id" />
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="btn btn-mark-done"
+                                                    onclick="return confirm('Confirm that you have received your vehicle?')">
+                                                <i class="fas fa-check me-1"></i> Mark as Done
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (order.Status == "DONE")
+                                    {
+                                        <div class="text-success">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong>Order Completed</strong>
+                                            <br>
+                                            <small class="text-muted">Thank you for your purchase!</small>
+                                        </div>
+                                    }
+                                    else if (order.Status == "CANCELLED")
+                                    {
+                                        <div class="text-danger">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            <strong>Order Cancelled</strong>
                                         </div>
                                     </div>
                                 } else {
@@ -246,5 +313,93 @@
 @section Scripts {
     <script>
         setTimeout(() => $('.alert').fadeOut(), 5000);
+
+        function showVerifyModal(orderId) {
+            document.getElementById('verifyOrderId').value = orderId;
+            document.getElementById('modalOrderId').textContent = '#' + orderId.toString().padStart(6, '0');
+            var modal = new bootstrap.Modal(document.getElementById('verifyPaymentModal'));
+            modal.show();
+        }
+
+        function submitVerification() {
+            var orderId = document.getElementById('verifyOrderId').value;
+            var transactionId = document.getElementById('verifyTransactionId').value;
+            
+            if (!transactionId.trim()) {
+                alert('Please enter the VNPay transaction ID.');
+                return;
+            }
+
+            // Create and submit form
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '?handler=VerifyPayment';
+
+            var orderIdInput = document.createElement('input');
+            orderIdInput.type = 'hidden';
+            orderIdInput.name = 'orderId';
+            orderIdInput.value = orderId;
+            form.appendChild(orderIdInput);
+
+            var transactionIdInput = document.createElement('input');
+            transactionIdInput.type = 'hidden';
+            transactionIdInput.name = 'transactionId';
+            transactionIdInput.value = transactionId;
+            form.appendChild(transactionIdInput);
+
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            form.appendChild(tokenInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
 }
+
+<!-- Payment Verification Modal -->
+<div class="modal fade" id="verifyPaymentModal" tabindex="-1" aria-labelledby="verifyPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verifyPaymentModalLabel">
+                    <i class="fas fa-check-circle text-success me-2"></i>Verify Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Instructions:</strong> If you completed payment on VNPay but the status didn't update automatically, use this form to verify your payment.
+                </div>
+
+                <form method="post" asp-page-handler="VerifyPayment">
+                    <div class="mb-3">
+                        <label class="form-label" for="transactionId">Transaction ID (VNP Transaction No.)</label>
+                        <input type="text" id="transactionId" name="TransactionId" class="form-control" placeholder="Enter VNPay Transaction No." required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="orderId">Order ID</label>
+                        <input type="number" id="orderId" name="OrderId" class="form-control" placeholder="Enter your Order ID" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="amount">Amount (VNĐ)</label>
+                        <input type="number" id="amount" name="Amount" class="form-control" placeholder="Enter payment amount" required />
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-search me-2"></i>Verify Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
