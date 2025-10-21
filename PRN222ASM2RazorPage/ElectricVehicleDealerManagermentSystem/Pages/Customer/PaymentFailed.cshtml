@@ -1,0 +1,87 @@
+@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Customer.PaymentFailedModel
+@{
+    ViewData["Title"] = "Payment Failed";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-danger">
+                <div class="card-body text-center p-5">
+                    <div class="text-danger mb-4">
+                        <i class="fas fa-times-circle fa-5x"></i>
+                    </div>
+                    
+                    <h2 class="text-danger mb-3">Payment Failed</h2>
+                    
+                    <p class="lead mb-4 text-muted">
+                        Unfortunately, your payment could not be processed.
+                    </p>
+
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Reason:</strong> @Model.FailureReason
+                    </div>
+
+                    @if (Model.OrderId > 0)
+                    {
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Order ID:</strong><br>
+                                        <span class="text-primary">#@Model.OrderId.ToString().PadLeft(6, '0')</span>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                                    {
+                                        <div class="col-md-6">
+                                            <strong>Transaction ID:</strong><br>
+                                            <span class="text-muted">@Model.TransactionId</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>What's Next?</strong><br>
+                        You can try paying again or contact customer support if you continue to experience issues.
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        @if (Model.OrderId > 0)
+                        {
+                            <a asp-page="/Customer/MyOrders" class="btn btn-warning btn-lg">
+                                <i class="fas fa-credit-card me-2"></i>Try Payment Again
+                            </a>
+                        }
+                        <a asp-page="/Vehicle/Browse" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-car me-2"></i>Browse Vehicles
+                        </a>
+                        <a asp-page="/Customer/Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </div>
+
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            Need help? Contact our customer support team.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Payment failed page loaded');
+        });
+    </script>
+}
