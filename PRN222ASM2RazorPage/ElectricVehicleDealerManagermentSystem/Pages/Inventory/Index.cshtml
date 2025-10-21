@@ -8,53 +8,49 @@
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h2 class="mb-0">
-                <i class="fas fa-warehouse text-primary me-2"></i>
+            <h2 class="fw-bold mb-0" style="color: var(--primary);"><i class="fas fa-warehouse me-2" style="color: var(--accent);"></i>
                 Inventory Management
             </h2>
             <p class="text-muted mb-0">Manage your vehicle inventory and stock levels - @Model.DealerName</p>
         </div>
         <div class="col-md-4 text-end">
-            <a asp-page="./Create" class="btn btn-success">
+            <a asp-page="./Create" class="btn btn-accent rounded-3 shadow-sm">
                 <i class="fas fa-plus me-2"></i>Add to Inventory
             </a>
         </div>
     </div>
-
     <!-- Success/Error Messages -->
     @if (!string.IsNullOrEmpty(Model.SuccessMessage))
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success rounded-3 shadow-sm alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger rounded-3 shadow-sm alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
     <!-- Filters -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-light">
-            <h6 class="card-title mb-0">
+    <div class="card mb-4 shadow-sm border-0 rounded-4">
+        <div class="card-header bg-info text-white rounded-top-4">
+            <h6 class="mb-0 fw-semibold">
                 <i class="fas fa-filter me-2"></i>Filters & Search
             </h6>
         </div>
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-4">
-                    <label for="SearchTerm" class="form-label">
+                    <label for="SearchTerm" class="form-label fw-semibold">
                         <i class="fas fa-search me-1"></i>Search
                     </label>
                     <input asp-for="SearchTerm" class="form-control" placeholder="Search by model, color, version..." />
                 </div>
                 <div class="col-md-3">
-                    <label for="CategoryFilter" class="form-label">
+                    <label for="CategoryFilter" class="form-label fw-semibold">
                         <i class="fas fa-tags me-1"></i>Category
                     </label>
                     <select asp-for="CategoryFilter" asp-items="Model.CategorySelectList" class="form-select"></select>
@@ -66,21 +62,20 @@
                     </div>
                 </div>
                 <div class="col-md-3 align-self-end text-end">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary rounded-pill">
                         <i class="fas fa-search me-2"></i>Apply Filters
                     </button>
-                    <a asp-page="./Index" class="btn btn-outline-secondary ms-2">
+                    <a asp-page="./Index" class="btn btn-outline-secondary ms-2 rounded-pill">
                         <i class="fas fa-undo me-1"></i>Reset
                     </a>
                 </div>
             </form>
         </div>
     </div>
-
     <!-- Inventory Table -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-light">
-            <h6 class="card-title mb-0">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h6 class="mb-0 fw-semibold">
                 <i class="fas fa-list me-2"></i>Inventory List
             </h6>
         </div>
@@ -109,14 +104,14 @@
                                     <td style="width: 100px;">
                                         @if (!string.IsNullOrEmpty(item.VehicleImage))
                                         {
-                                            <img src="@item.VehicleImage" alt="Vehicle Image" class="img-thumbnail" style="max-width: 80px; height: auto;" />
+                                            <img src="@item.VehicleImage" alt="Vehicle Image" class="img-thumbnail rounded shadow-sm" style="max-width: 80px; height: auto; border: 2px solid var(--background);" />
                                         }
                                         else
                                         {
                                             <span class="text-muted">No Image</span>
                                         }
                                     </td>
-                                    <td>@item.VehicleModel</td>
+                                    <td style="color: var(--primary); font-weight: 600;">@item.VehicleModel</td>
                                     <td>@(string.IsNullOrEmpty(item.VehicleVersion) ? "-" : item.VehicleVersion)</td>
                                     <td>@item.VehicleColor</td>
                                     <td>@item.CategoryName</td>
@@ -124,22 +119,22 @@
                                     <td>
                                         @if (item.Quantity > 0)
                                         {
-                                            <span class="badge bg-success">@item.Quantity</span>
+                                            <span class="badge bg-success rounded-pill px-3">@item.Quantity</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">Out</span>
+                                            <span class="badge bg-danger rounded-pill px-3">Out</span>
                                         }
                                     </td>
                                     <td>@item.VehicleManufactureDate.ToString("yyyy-MM-dd")</td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a asp-page="./Update" asp-route-vehicleId="@item.VehicleId" class="btn btn-sm btn-outline-primary">
+                                            <a asp-page="./Update" asp-route-vehicleId="@item.VehicleId" class="btn btn-sm btn-outline-primary rounded-pill">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form method="post" asp-page-handler="RemoveFromInventory" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this item?');">
                                                 <input type="hidden" name="vehicleId" value="@item.VehicleId" />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill ms-2">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

@@ -169,6 +169,32 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
             return RedirectToPage();
         }
 
+        public async Task<IActionResult> OnPostCancelAppointmentAsync(int appointmentId)
+        {
+            try
+            {
+                var result = await _appointmentServices.CancelAppointmentAsync(appointmentId);
+
+                if (result.Success)
+                {
+                    // Send real-time notification to refresh all appointment pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
+                    TempData["SuccessMessage"] = result.Message;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = result.Message;
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while cancelling the appointment: " + ex.Message;
+            }
+
+            return RedirectToPage();
+        }
+
         private async Task LoadDataAsync()
         {
             await LoadAppointmentsAsync();
@@ -270,6 +296,11 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Appointment
         public bool CanCompleteAppointment(string status)
         {
             return status.Equals("RUNNING", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool CanCancelAppointment(string status)
+        {
+            return status.Equals("PENDING", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

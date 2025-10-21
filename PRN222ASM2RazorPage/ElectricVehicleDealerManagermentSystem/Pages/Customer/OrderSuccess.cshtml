@@ -1,0 +1,82 @@
+@page
+@model ElectricVehicleDealerManagermentSystem.Pages.Customer.OrderSuccessModel
+@{
+    ViewData["Title"] = "Order Success";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <div class="text-success mb-4">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Order Completed Successfully!</h2>
+                    
+                    <p class="lead mb-4 text-muted">
+                        Thank you for your purchase! Your payment has been processed and your order is confirmed.
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(Model.OrderId))
+                    {
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Order ID:</strong><br>
+                                        <span class="text-primary">#@Model.OrderId.PadLeft(6, '0')</span>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                                    {
+                                        <div class="col-md-4">
+                                            <strong>Transaction ID:</strong><br>
+                                            <span class="text-muted">@Model.TransactionId</span>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Amount))
+                                    {
+                                        <div class="col-md-4">
+                                            <strong>Amount Paid:</strong><br>
+                                            <span class="text-success fw-bold">@Model.Amount</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>What's Next?</strong><br>
+                        Our dealer will process your order and contact you for delivery arrangements. You can track your order status in "My Orders".
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a asp-page="/Customer/MyOrders" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag me-2"></i>View My Orders
+                        </a>
+                        <a asp-page="/Vehicle/Browse" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-car me-2"></i>Browse More Vehicles
+                        </a>
+                        <a asp-page="/Customer/Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-celebrate with confetti effect (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can add confetti.js or similar celebration effects here
+            console.log('?? Order completed successfully!');
+        });
+    </script>
+}

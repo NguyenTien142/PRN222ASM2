@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,159 +21,152 @@
     <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main[role="main"] {
+            flex: 1;
+        }
+        .navbar {
+            background: var(--white) !important;
+            border-bottom: 2.5px solid var(--accent);
+            box-shadow: 0 3px 16px rgba(44, 62, 80, 0.07);
+        }
+        .navbar-brand {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            font-size: 1.8rem;
+        }
+        .navbar-nav .nav-link, .nav-link {
+            font-size: 1.1rem;
+            margin-left: 8px;
+            margin-right: 8px;
+            color: var(--primary) !important;
+            transition: color 0.18s, background 0.18s, border-radius 0.18s;
+            padding: 0.6rem 1rem;
+            border-radius: 0.8rem;
+        }
+        .navbar-nav .nav-link:hover, .nav-link:hover {
+            color: var(--white) !important;
+            background: var(--primary);
+        }
+        .navbar .btn, .navbar-nav .btn {
+            font-weight: 600;
+            border-radius: 1.5rem;
+        }
+        .navbar .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+        }
+        .navbar .btn-primary:hover {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        .navbar .btn-accent {
+            background: var(--accent);
+            color: var(--secondary);
+        }
+        .navbar .btn-accent:hover {
+            background: var(--primary);
+            color: var(--accent);
+        }
+        .footer {
+            margin-bottom: 0px !important;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom shadow-sm mb-3">
+        <nav class="navbar navbar-expand-sm align-items-center shadow-sm">
             <div class="container">
-                <!-- Brand -->
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/Index">
-                    <i class="fas fa-bolt text-primary me-2"></i>
-                    <strong>EV Dealer</strong>
-                </a>
-
-                <!-- Mobile toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav" aria-controls="navbarNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                @if (Context.Session.GetInt32("UserId").HasValue && Context.Session.GetString("RoleName")?.ToLower() == "dealer")
+                {
+                    <span class="navbar-brand d-flex align-items-center" style="cursor: default; user-select: none; color: var(--accent) !important; opacity: 0.8;">
+                        <i class="fas fa-bolt me-2" style="color: var(--accent); font-size: 1.7rem;"></i>
+                        <span>EV Dealer</span>
+                    </span>
+                }
+                else
+                {
+                    <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/Index">
+                        <i class="fas fa-bolt me-2" style="color: var(--accent); font-size: 1.7rem;"></i>
+                        <span>EV Dealer</span>
+                    </a>
+                }
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
-                <!-- Nav content -->
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        @* <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">
-                                <i class="fas fa-home me-1"></i> Home
-                            </a>
-                        </li> *@
-
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @if (Context.Session.GetInt32("UserId").HasValue)
                         {
                             var roleName = Context.Session.GetString("RoleName")?.ToLower();
-
-                            if (roleName == "customer")
-                            {
-
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Customer/Index">
-                                        <i class="fas fa-user me-1"></i> Dashboard
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Vehicle/Browse">
-                                        <i class="fas fa-car me-1"></i> Browse Vehicles
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Customer/MyOrders">
-                                        <i class="fas fa-shopping-bag me-1"></i> My Orders
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/appointment/Index">
-                                        <i class="fas fa-calendar me-1"></i> Appointments
-                                    </a>
-                                </li>
+                            if (roleName == "customer") {
+                                <li class="nav-item"><a class="nav-link" asp-page="/Customer/Index"><i class="fas fa-user me-2"></i> Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-page="/Vehicle/Browse"><i class="fas fa-car me-2"></i> Browse Vehicles</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-page="/Customer/MyOrders"><i class="fas fa-shopping-bag me-2"></i> My Orders</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-page="/appointment/Index"><i class="fas fa-calendar me-2"></i> Appointments</a></li>
+                            } else if (roleName == "dealer") {
+                                <li class="nav-item"><a class="nav-link" asp-page="/Dealer/Index"><i class="fas fa-store me-2"></i> Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-page="/Category/Index"><i class="fas fa-car me-2"></i> Manage Category</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-page="/Vehicle/Index"><i class="fas fa-car me-2"></i> Manage Vehicle</a></li>
                             }
-                            else if (roleName == "dealer")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Dealer/Index">
-                                        <i class="fas fa-store me-1"></i> Dashboard
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Category/Index">
-                                        <i class="fas fa-car me-1"></i> Manage Category
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Vehicle/Index">
-                                        <i class="fas fa-car me-1"></i> Manage Vehicle
-                                    </a>
-                                </li>
-                            }
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Privacy">
-                                    <i class="fas fa-shield-alt me-1"></i> Privacy
-                                </a>
-                            </li>
+                        } else {
+                            @* <li class="nav-item"><a class="nav-link" asp-page="/Privacy"><i class="fas fa-shield-alt me-2"></i> Privacy</a></li> *@
                         }
                     </ul>
-
-                    <!-- Authentication Section -->
                     <ul class="navbar-nav">
                         @if (Context.Session.GetInt32("UserId").HasValue)
                         {
                             var roleName = Context.Session.GetString("RoleName") ?? "User";
-                            var displayName = Context.Session.GetString("CustomerName")
-                            ?? Context.Session.GetString("DealerName")
-                            ?? Context.Session.GetString("Username")
-                            ?? "User";
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark d-flex align-items-center"
-                                   href="#" id="userDropdown" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle me-1"></i>
+                            var displayName = Context.Session.GetString("CustomerName") ?? Context.Session.GetString("DealerName") ?? Context.Session.GetString("Username") ?? "User";
+                            <li class="nav-item">
+                                <span class="nav-link" style="cursor: default !important; user-select: none; pointer-events: none; color: inherit !important; background: transparent !important; border: none !important; text-decoration: none !important;">
+                                    <i class="fas fa-user-circle me-2"></i>
                                     @displayName (@roleName)
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-danger btn-sm ms-2 me-2" asp-page="/Credential/Logout" style="border-radius: 20px; font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Logout
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-page="/Profile/Index">
-                                            <i class="fas fa-id-badge me-1"></i> Profile
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" asp-page="/Credential/Logout">
-                                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Credential/Login">
-                                    <i class="fas fa-sign-in-alt me-1"></i> Login
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Credential/Register">
-                                    <i class="fas fa-user-plus me-1"></i> Register
-                                </a>
-                            </li>
+                            <li class="nav-item"><a class="btn btn-primary px-4 me-2" asp-page="/Credential/Login"><i class="fas fa-sign-in-alt me-1"></i> Login</a></li>
+                            <li class="nav-item"><a class="btn btn-accent px-4" asp-page="/Credential/Register"><i class="fas fa-user-plus me-1"></i> Register</a></li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container flex-grow-1 d-flex flex-column">
+        <main role="main" class="pb-3 flex-grow-1">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted text-center py-3 mt-4">
-        <div class="container">
-            &copy; @DateTime.Now.Year - Electric Vehicle Dealer Management System
+    <footer class="footer text-center py-4 mt-4" style="background: var(--secondary); border-top: 3px solid var(--accent); margin-bottom:0;">
+        <div class="container d-flex flex-column align-items-center justify-content-center">
+            <span class="fw-semibold fs-6" style="color: var(--accent); letter-spacing: 0.5px;">
+                <i class="fas fa-bolt me-2" style="color: var(--accent);"></i>
+                &copy; @DateTime.Now.Year EV Dealer &ndash; Electric Vehicle Dealer Management System
+            </span>
         </div>
     </footer>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- SignalR client from CDN (v8) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("Styles", required: false)
-
 </body>
 </html>

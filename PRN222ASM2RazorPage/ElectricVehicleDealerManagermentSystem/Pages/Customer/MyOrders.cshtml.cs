@@ -4,6 +4,8 @@ using Services.DataTransferObject.OrderDTO;
 using Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using ElectricVehicleDealerManagermentSystem.SignalR;
+using Services.Helpper.VNPay;
+using Services.DataTransferObject.VNPay;
 
 namespace ElectricVehicleDealerManagermentSystem.Pages.Customer
 {
@@ -11,11 +13,13 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Customer
     {
         private readonly IOrderServices _orderServices;
         private readonly IHubContext<SignalRHub> _hubContext;
+        private readonly VnPayService _vnPayService;
 
-        public MyOrdersModel(IOrderServices orderServices, IHubContext<SignalRHub> hubContext)
+        public MyOrdersModel(IOrderServices orderServices, IHubContext<SignalRHub> hubContext, VnPayService vnPayService)
         {
             _orderServices = orderServices;
             _hubContext = hubContext;
+            _vnPayService = vnPayService;
         }
 
         public List<OrderResponse> MyOrders { get; set; } = new List<OrderResponse>();
@@ -37,6 +41,164 @@ namespace ElectricVehicleDealerManagermentSystem.Pages.Customer
 
             await LoadMyOrders();
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostPayAsync(int orderId)
+        {
+            try
+            {
+                // Check if user is logged in as customer
+                var userRole = HttpContext.Session.GetString("RoleName");
+                if (string.IsNullOrEmpty(userRole) || userRole.ToLower() != "customer")
+                {
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                if (orderId <= 0)
+                {
+                    ErrorMessage = "Invalid order ID.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Get customer ID
+                var customerId = HttpContext.Session.GetInt32("CustomerId");
+                if (!customerId.HasValue)
+                {
+                    ErrorMessage = "Customer information not found. Please login again.";
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                // Load orders first to verify ownership
+                await LoadMyOrders();
+
+                // Find the specific order
+                var orderToPay = MyOrders.FirstOrDefault(o => o.Id == orderId);
+                if (orderToPay == null)
+                {
+                    ErrorMessage = $"Order #{orderId} not found.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Verify ownership
+                if (orderToPay.CustomerId != customerId.Value)
+                {
+                    ErrorMessage = $"Order #{orderId} does not belong to you.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Check if status is PENDING
+                if (orderToPay.Status != "PENDING")
+                {
+                    ErrorMessage = $"Only pending orders can be paid. Current status: {orderToPay.Status}";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Create payment information for VNPay
+                var paymentInfo = new PaymentInformationModel
+                {
+                    OrderId = orderId,
+                    Amount = orderToPay.TotalAmount,
+                    OrderDescription = $"Payment for Vehicle Order #{orderId}",
+                    OrderType = "vehicle_purchase"
+                };
+
+                // Generate VNPay payment URL
+                var paymentUrl = _vnPayService.CreatePaymentUrl(paymentInfo, HttpContext);
+
+                // Redirect to VNPay payment page
+                return Redirect(paymentUrl);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "An error occurred while processing payment: " + ex.Message;
+                await LoadMyOrders();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostVerifyPaymentAsync(int orderId, string transactionId)
+        {
+            try
+            {
+                // Check if user is logged in as customer
+                var userRole = HttpContext.Session.GetString("RoleName");
+                if (string.IsNullOrEmpty(userRole) || userRole.ToLower() != "customer")
+                {
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                if (orderId <= 0)
+                {
+                    ErrorMessage = "Invalid order ID.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Get customer ID
+                var customerId = HttpContext.Session.GetInt32("CustomerId");
+                if (!customerId.HasValue)
+                {
+                    ErrorMessage = "Customer information not found. Please login again.";
+                    return RedirectToPage("/Credential/Login");
+                }
+
+                // Load orders first to verify ownership
+                await LoadMyOrders();
+
+                // Find the specific order
+                var orderToVerify = MyOrders.FirstOrDefault(o => o.Id == orderId);
+                if (orderToVerify == null)
+                {
+                    ErrorMessage = $"Order #{orderId} not found.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Verify ownership
+                if (orderToVerify.CustomerId != customerId.Value)
+                {
+                    ErrorMessage = $"Order #{orderId} does not belong to you.";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Check if status is PENDING
+                if (orderToVerify.Status != "PENDING")
+                {
+                    ErrorMessage = $"This order has already been processed. Current status: {orderToVerify.Status}";
+                    await LoadMyOrders();
+                    return Page();
+                }
+
+                // Update order status to PAID (since VNPay payment was successful)
+                var result = await _orderServices.UpdateOrderStatusWithInventory(orderId, "PAID");
+                
+                if (result.Success)
+                {
+                    // Send real-time notification to refresh order pages
+                    await _hubContext.Clients.All.SendAsync("LoadAllItems");
+                    
+                    SuccessMessage = $"Payment verified successfully! Order #{orderId} has been marked as PAID. Transaction ID: {transactionId}";
+                }
+                else
+                {
+                    ErrorMessage = $"Failed to update order status: {result.Message}";
+                }
+
+                // Reload orders to show updated status
+                await LoadMyOrders();
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "An error occurred while verifying payment: " + ex.Message;
+                await LoadMyOrders();
+                return Page();
+            }
         }
 
         public async Task<IActionResult> OnPostMarkAsDoneAsync()

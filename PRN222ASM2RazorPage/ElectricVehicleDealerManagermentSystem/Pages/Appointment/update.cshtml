@@ -8,109 +8,60 @@
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-secondary">
-                <i class="fas fa-clock me-2"></i>Reschedule Appointment
-            </h3>
+            <h3 class="fw-bold" style="color: var(--secondary);"><i class="fas fa-clock me-2" style="color: var(--primary);"></i>Reschedule Appointment</h3>
             <p class="text-muted mb-0">Welcome, @Model.CustomerName</p>
         </div>
-        <a href="/appointment" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i>Back to Appointments
-        </a>
+        <a href="/appointment" class="btn btn-outline-secondary rounded-pill"><i class="fas fa-arrow-left me-1"></i>Back to Appointments</a>
     </div>
-
     <!-- Success / Error Messages -->
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>@Model.ErrorMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        <div class="alert alert-danger rounded-2 shadow-sm mb-2 alert-dismissible fade show" role="alert"><i class="fas fa-exclamation-circle me-2"></i>@Model.ErrorMessage<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
     }
     @if (!string.IsNullOrEmpty(Model.SuccessMessage))
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        <div class="alert alert-success rounded-2 shadow-sm mb-2 alert-dismissible fade show" role="alert"><i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
     }
-
     @if (Model.CurrentAppointment != null)
     {
-        <!-- Current Appointment Info -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-info text-white">
-                <i class="fas fa-info-circle me-2"></i>Current Appointment Details
-            </div>
+        <!-- Appointment Info -->
+        <div class="card shadow-sm mb-4 border-0 rounded-4">
+            <div class="card-header bg-info text-white rounded-top-4"><i class="fas fa-info-circle me-2"></i>Current Appointment Details</div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 d-flex align-items-center mb-3">
-                        <img src="@Model.CurrentAppointment.VehicleImage"
-                             alt="@Model.CurrentAppointment.VehicleModel"
-                             class="rounded me-3"
-                             style="width: 90px; height: 65px; object-fit: cover;" />
+                        <img src="@Model.CurrentAppointment.VehicleImage" alt="@Model.CurrentAppointment.VehicleModel" class="rounded-3 me-3 shadow-sm border" style="width: 90px; height: 65px; object-fit: cover;" />
                         <div>
-                            <h6 class="fw-bold mb-1">@Model.CurrentAppointment.VehicleModel (@Model.CurrentAppointment.VehicleColor)</h6>
-                            <p class="text-muted mb-0">
-                                @Model.CurrentAppointment.VehicleCategoryName<br />
-                                <span class="fw-bold text-primary">@Model.CurrentAppointment.VehiclePrice.ToString("C")</span>
-                            </p>
+                            <h6 class="fw-bold mb-1" style="color:var(--primary);">@Model.CurrentAppointment.VehicleModel (@Model.CurrentAppointment.VehicleColor)</h6>
+                            <p class="text-muted mb-0">@Model.CurrentAppointment.VehicleCategoryName<br /> <span class="fw-bold text-primary">@Model.CurrentAppointment.VehiclePrice.ToString("C")</span></p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <p class="mb-1"><strong>Current Date:</strong> @Model.CurrentAppointment.AppointmentDate.ToString("dddd, dd MMM yyyy hh:mm tt")</p>
-                        <p class="mb-1">
-                            <strong>Status:</strong>
-                            <span class="@Model.GetStatusBadgeClass(Model.CurrentAppointment.Status)">
-                                @Model.CurrentAppointment.Status
-                            </span>
-                        </p>
+                        <p class="mb-1"><strong>Status:</strong> <span class="@Model.GetStatusBadgeClass(Model.CurrentAppointment.Status) rounded-pill">@Model.CurrentAppointment.Status</span></p>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Reschedule Form -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <i class="fas fa-calendar-alt me-2"></i>Select New Appointment Time
-            </div>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-light rounded-top-4"><i class="fas fa-calendar-alt me-2" style="color:var(--primary);"></i>Select New Appointment Time</div>
             <div class="card-body">
                 <form method="post">
                     <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
-
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="selectedDate" class="form-label fw-bold">Select Date</label>
-                            <input type="date"
-                                   id="selectedDate"
-                                   name="SelectedDate"
-                                   class="form-control"
-                                   value="@Model.SelectedDate.ToString("yyyy-MM-dd")"
-                                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <input type="date" id="selectedDate" name="SelectedDate" class="form-control rounded-pill" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                         </div>
-
                         <div class="col-md-6">
                             <label for="timeSlot" class="form-label fw-bold">Select Time</label>
-                            <select id="timeSlot" name="NewAppointmentDate" class="form-select">
-                                <option value="">-- Select a Time Slot --</option>
-                                @foreach (var slot in Model.AvailableTimeSlots)
-                                {
-                                    <option value="@slot.ToString("yyyy-MM-ddTHH:mm")"
-                                            selected="@(Model.NewAppointmentDate == slot ? "selected" : null)">
-                                        @slot.ToString("HH:mm")
-                                    </option>
-                                }
-                            </select>
+                            <select id="timeSlot" name="NewAppointmentDate" class="form-select rounded-pill"><option value="">-- Select a Time Slot --</option>@foreach (var slot in Model.AvailableTimeSlots){ <option value="@slot.ToString("yyyy-MM-ddTHH:mm")" selected="@(Model.NewAppointmentDate == slot ? "selected" : null)">@slot.ToString("HH:mm")</option> }</select>
                         </div>
                     </div>
-
                     <div class="text-end">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save me-1"></i>Save Changes
-                        </button>
-                        <a href="/appointment" class="btn btn-secondary">
-                            <i class="fas fa-times me-1"></i>Cancel
-                        </a>
+                        <button type="submit" class="btn btn-success rounded-pill px-4"><i class="fas fa-save me-1"></i>Save Changes</button>
+                        <a href="/appointment" class="btn btn-outline-secondary rounded-pill ms-2"><i class="fas fa-times me-1"></i>Cancel</a>
                     </div>
                 </form>
             </div>
@@ -118,9 +69,7 @@
     }
     else
     {
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle me-2"></i>No appointment found.
-        </div>
+        <div class="alert alert-warning rounded-2 shadow-sm"><i class="fas fa-exclamation-triangle me-2"></i>No appointment found.</div>
     }
 </div>
 
