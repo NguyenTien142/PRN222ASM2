@@ -63,6 +63,9 @@ namespace ElectricVehicleDealerManagermentSystem
             builder.Services.AddScoped<IUserServices, UserServices>();
             builder.Services.AddScoped<IVehicleCategoryServices, VehicleCategoryServices>();
 
+            // Add VNPay Service
+            builder.Services.AddScoped<Services.Helpper.VNPay.VnPayService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
