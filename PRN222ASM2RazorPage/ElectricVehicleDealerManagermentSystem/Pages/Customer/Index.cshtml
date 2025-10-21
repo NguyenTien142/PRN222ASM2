@@ -9,8 +9,8 @@
     <!-- Welcome Header -->
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h2 class="fw-bold">
-                <i class="fas fa-user-circle text-primary me-2"></i>
+            <h2 class="fw-bold" style="color: var(--primary);">
+                <i class="fas fa-user-circle me-2" style="color: var(--accent);"></i>
                 Welcome, @Model.CustomerName!
             </h2>
             <p class="text-muted">Your Customer ID: <strong>@Model.CustomerId</strong></p>
@@ -18,15 +18,15 @@
     </div>
 
     <!-- Dashboard Cards -->
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
         <!-- Browse Vehicles -->
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body text-center">
-                    <i class="fas fa-car text-primary fa-3x mb-3"></i>
+                    <i class="fas fa-car fa-3x mb-3" style="color: var(--primary);"></i>
                     <h5 class="card-title fw-semibold">Browse Vehicles</h5>
                     <p class="card-text text-muted">Explore our wide range of electric vehicles available for purchase.</p>
-                    <a asp-page="/Vehicle/Browse" class="btn btn-primary w-100">
+                    <a asp-page="/Vehicle/Browse" class="btn btn-primary w-100 rounded-pill">
                         <i class="fas fa-arrow-right me-1"></i> View Vehicles
                     </a>
                 </div>
@@ -35,12 +35,12 @@
 
         <!-- My Orders -->
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body text-center">
-                    <i class="fas fa-shopping-bag text-info fa-3x mb-3"></i>
+                    <i class="fas fa-shopping-bag fa-3x mb-3" style="color: var(--info);"></i>
                     <h5 class="card-title fw-semibold">My Orders</h5>
                     <p class="card-text text-muted">Track your orders and delivery status. Mark orders as received.</p>
-                    <a asp-page="/Customer/MyOrders" class="btn btn-info text-white w-100">
+                    <a asp-page="/Customer/MyOrders" class="btn btn-info text-white w-100 rounded-pill">
                         <i class="fas fa-shopping-bag me-1"></i> View My Orders
                     </a>
                 </div>
@@ -49,27 +49,13 @@
 
         <!-- My Appointments -->
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
                 <div class="card-body text-center">
-                    <i class="fas fa-calendar text-success fa-3x mb-3"></i>
+                    <i class="fas fa-calendar fa-3x mb-3" style="color: var(--success);"></i>
                     <h5 class="card-title fw-semibold">My Appointments</h5>
                     <p class="card-text text-muted">Schedule or view your upcoming test drives and consultations.</p>
-                    <a asp-page="/Appointment/Index" class="btn btn-success w-100">
+                    <a asp-page="/Appointment/Index" class="btn btn-success w-100 rounded-pill">
                         <i class="fas fa-calendar-check me-1"></i> Manage Appointments
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Account Settings -->
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-cog text-warning fa-3x mb-3"></i>
-                    <h5 class="card-title fw-semibold">Account Settings</h5>
-                    <p class="card-text text-muted">Update your profile information and account preferences.</p>
-                    <a asp-page="/Profile/Index" class="btn btn-warning text-white w-100">
-                        <i class="fas fa-user-cog me-1"></i> Edit Profile
                     </a>
                 </div>
             </div>
